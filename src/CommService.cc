@@ -1,5 +1,5 @@
 
-#include "CommService.h"
+#include <CommService.h>
 
 #include <Arduino.h>
 #include <array>
@@ -11,9 +11,6 @@
 #include <StreamUtils.h>
 #include <algorithm>
 // #include <string_view>
-
-#include <debug.h>
-#include <device.h>
 
 std::vector<LFAST::ClientConnection> LFAST::CommsService::connections{};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +30,7 @@ void LFAST::CommsService::setupClientMessageBuffers(Client *client)
 
 void LFAST::CommsService::defaultMessageHandler(std::string info)
 {
-    TEST_SERIAL.printf("Unregistered Message: [%s].\r\n", info.c_str());
+    Serial2.printf("Unregistered Message: [%s].\r\n", info.c_str());
 }
 
 void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
@@ -42,7 +39,7 @@ void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
     ss << "Invalid Message.";
     //
     ss << std::endl;
-    TEST_SERIAL.println(ss.str().c_str());
+    Serial2.println(ss.str().c_str());
 }
 
 bool LFAST::CommsService::checkForNewClients()
@@ -72,8 +69,8 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
     Client *client = connection.client;
     if (client)
     {
-        // TEST_SERIAL.println("\r\n");
-        // TEST_SERIAL.printf("\r\n%u:", msgCount++);
+        // Serial2.println("\r\n");
+        // Serial2.printf("\r\n%u:", msgCount++);
         // CommsMessage newMsg;
         auto newMsg = new CommsMessage();
         unsigned int bytesRead = 0;
@@ -82,7 +79,7 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 
         while (client->connected())
         {
-            // TEST_SERIAL.println("Checking connected client messages");
+            // Serial2.println("Checking connected client messages");
             if (client->available())
             {
                 char c = client->read();
@@ -100,14 +97,14 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                     if (openObjectsCnt == 0)
                         objectDone = true;
                 }
-                // TEST_SERIAL.print(c);
+                // Serial2.print(c);
                 if (objectDone)
                 {
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
-                    // TEST_SERIAL.printf(" [%u bytes]\r\n", bytesRead);
+                    // Serial2.printf(" [%u bytes]\r\n", bytesRead);
 
                     connection.rxMessageQueue.push_back(newMsg);
-                    // TEST_SERIAL.println("Received Message:");
+                    // Serial2.println("Received Message:");
                     // newMsg->printMessageInfo();
                     break;
                 }
@@ -120,9 +117,9 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 void LFAST::CommsMessage::printMessageInfo()
 {
     CURSOR_TO_DEBUG_ROW(-3);
-    TEST_SERIAL.printf("MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-    // TEST_SERIAL.printf("\tMESSAGE Input Buffer: %s (%u bytes)\r\n", this->jsonInputBuffer, std::strlen(this->jsonInputBuffer));
-    TEST_SERIAL.print("MESSAGE Input Buffer: \033[0K");
+    Serial2.printf("MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
+    // Serial2.printf("\tMESSAGE Input Buffer: %s (%u bytes)\r\n", this->jsonInputBuffer, std::strlen(this->jsonInputBuffer));
+    Serial2.print("MESSAGE Input Buffer: \033[0K");
 
     bool nullTermFound = false;
     unsigned int ii = 0;
@@ -131,18 +128,18 @@ void LFAST::CommsMessage::printMessageInfo()
         char c2 = this->jsonInputBuffer[ii++];
         if (c2 != '\0')
         {
-            TEST_SERIAL.printf("%c", c2);
+            Serial2.printf("%c", c2);
         }
         else
         {
             nullTermFound = true;
-            TEST_SERIAL.printf("%s[%u]\r\n", "\\0", ii);
+            Serial2.printf("%s[%u]\r\n", "\\0", ii);
         }
     }
 
-    // serializeJson(jsonDoc, TEST_SERIAL);
-    // TEST_SERIAL.printf("\tBytes: %u\r\n", measureJson(jsonDoc));
-    TEST_SERIAL.println("");
+    // serializeJson(jsonDoc, Serial2);
+    // Serial2.printf("\tBytes: %u\r\n", measureJson(jsonDoc));
+    Serial2.println("");
 }
 
 void LFAST::CommsService::processClientData()
@@ -164,7 +161,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg)
 {
     if (msg->hasBeenProcessed())
     {
-        TEST_SERIAL.println("Something went wrong processing messages.");
+        Serial2.println("Something went wrong processing messages.");
         return;
     }
 
@@ -177,7 +174,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg)
     for (JsonPair kvp : msgObject)
     {
         // auto keyStr = kvp.key().c_str();
-        // TEST_SERIAL.printf("Processing Key: %s\r\n", keyStr);
+        // Serial2.printf("Processing Key: %s\r\n", keyStr);
         this->callMessageHandler(kvp);
     }
     msg->setProcessedFlag();
@@ -238,7 +235,7 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 
 void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 {
-    // TEST_SERIAL.println("Sending message:");
+    // Serial2.println("Sending message:");
     // msg.printMessageInfo();
     if (sendOpt == ACTIVE_CONNECTION)
     {
@@ -250,7 +247,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     else
     {
         // TODO
-        TEST_SERIAL.println("Not yet implemented (something went wrong).");
+        Serial2.println("Not yet implemented (something went wrong).");
     }
 }
 
@@ -259,8 +256,8 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize()
     DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
     if (error)
     {
-        TEST_SERIAL.print(F("deserializeJson() failed: "));
-        TEST_SERIAL.println(error.f_str());
+        Serial2.print(F("deserializeJson() failed: "));
+        Serial2.println(error.f_str());
     }
     return this->JsonDoc;
 }
@@ -271,7 +268,7 @@ void LFAST::CommsService::stopDisconnectedClients()
     {
         if (!(*itr).client->connected())
         {
-            // TEST_SERIAL.println("Disconnected client.");
+            // Serial2.println("Disconnected client.");
             (*itr).client->stop();
             itr = connections.erase(itr);
         }

@@ -1,17 +1,15 @@
 #pragma once
 
+#include <Arduino.h>
+#include "Client.h"
+#include <ArduinoJson.h>
+
 #include <cstdint>
-// #include <array>
 #include <vector>
 #include <unordered_map>
 #include <sstream>
 #include <cstring>
-#include <device.h>
-#include <debug.h>
-// #include <initializer_list>
-#include <ArduinoJson.h>
-#include <Arduino.h>
-#include "Client.h"
+
 
 #define MAX_ARGS 4
 #define RX_BUFF_SIZE 1024
