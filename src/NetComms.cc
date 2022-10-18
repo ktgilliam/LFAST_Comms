@@ -8,6 +8,9 @@
 
 #include <NetComms.h>
 
+
+#include <Arduino.h>
+
 #ifdef TEENSY41
 #include <NativeEthernet.h>
 #else
@@ -15,7 +18,6 @@
 #include <Ethernet.h>
 #endif
 
-#include <Arduino.h>
 
 #include <debug.h>
 #include <array>

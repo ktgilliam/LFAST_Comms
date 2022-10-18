@@ -1,6 +1,7 @@
 
 #include "CommService.h"
 
+#include <Arduino.h>
 #include <array>
 #include <sstream>
 #include <iterator>

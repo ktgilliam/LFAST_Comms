@@ -31,7 +31,8 @@
 	"platforms": "teensy",
 	"build": {
 		"flags": [
-			"-I include"
+			"-I include",
+			"-D TEENSY41"
 		]
 	},
 	"headers": ["CommService.h", "NetComms,h"]
