@@ -2,8 +2,9 @@
 
 #include <cstdint>
 #include <NativeEthernet.h>
-#include <CommService.h>
 #include <list>
+
+#include "CommService.h"
 
 #define PORT 4400
 
@@ -11,19 +12,6 @@
 #define MAX_CLIENTS 4
 namespace LFAST
 {
-    // struct NetCommsMessage : public CommsMessage
-    // {
-    //     NetCommsMessage() {}
-    //     virtual ~NetCommsMessage() {}
-    //     NetCommsMessage(uint16_t _msgId) : client(NULL) {}
-    //     NetCommsMessage(uint16_t _msgId, EthernetClient *_client) : client(_client) {}
-    //     void setClient(EthernetClient *_client) { this->client = _client; }
-    //     EthernetClient *getClient() { return this->client; }
-
-    // protected:
-    //     EthernetClient *client;
-    // };
-
     class EthernetCommsService : public CommsService
     {
     private:

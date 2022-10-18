@@ -30,8 +30,6 @@
 #include <iterator>
 // #include <regex>
 
-#include <device.h>
-
 // Initialize the Ethernet server library
 // with the IP address and port you want to use
 
