@@ -148,8 +148,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg)
         Serial2.println("Something went wrong processing messages.");
         return;
     }
-
-    msg->printMessageInfo();
+    
     StaticJsonDocument<JSON_PROGMEM_SIZE> &doc = msg->deserialize();
     JsonObject msgRoot = doc.as<JsonObject>();
     JsonObject msgObject = msgRoot["MountMessage"];
