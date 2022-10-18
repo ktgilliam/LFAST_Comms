@@ -17,10 +17,17 @@
   ],
   "license": "MIT",
   "homepage": "https://www.helloworld.org/",
-  "dependencies":{
+  "dependencies": [
+  {
   	"name": "NativeEthernet",
     	"version": "git@github.com:vjmuzik/NativeEthernet.git"
   },
+  {
+  	"owner": "bblanchon",
+  	"name": "StreamUtils",
+  	"version": "^1.6.3"
+  }
+  ],
   "frameworks": "Arduino",
   "platforms": "teensy",
   "headers": ["CommService.h", "NetComms,h"]
