@@ -116,7 +116,6 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 
 void LFAST::CommsMessage::printMessageInfo()
 {
-    CURSOR_TO_DEBUG_ROW(-3);
     Serial2.printf("MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
     // Serial2.printf("\tMESSAGE Input Buffer: %s (%u bytes)\r\n", this->jsonInputBuffer, std::strlen(this->jsonInputBuffer));
     Serial2.print("MESSAGE Input Buffer: \033[0K");
