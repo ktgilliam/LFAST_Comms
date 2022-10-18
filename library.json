@@ -1,39 +1,38 @@
 {
-  "name": "LFAST_Comms",
-  "version": "1.0.0",
-  "description": "Communications client using Arduino's Client abstraction and a subset of the JSON standard",
-  "keywords": "JSON,Ethernet,Teensy",
-  "repository":
-  {
-    "type": "git",
-    "url": "git@github.com:ktgilliam/LFAST_Comms.git"
-  },
-  "authors":
-  [
-    {
-      "name": "Kevin Gilliam",
-      "email": "keving@arizona.edu"
-    }
-  ],
-  "license": "MIT",
-  "homepage": "https://www.helloworld.org/",
-  "dependencies": [
-  {
-  	"name": "NativeEthernet",
-    	"version": "git@github.com:vjmuzik/NativeEthernet.git"
-  },
-  {
-  	"owner": "bblanchon",
-  	"name": "StreamUtils",
-  	"version": "^1.6.3"
-  },
-  {
-  	"owner": "bblanchon",
-  	"name": "ArduinoJson",
-  	"version": "^6.19.4"
-  }
-  ],
-  "frameworks": "Arduino",
-  "platforms": "teensy",
-  "headers": ["CommService.h", "NetComms,h"]
+	"name": "LFAST_Comms",
+	"version": "1.0.0",
+	"description": "Communications client using Arduino's Client abstraction and a subset of the JSON standard",
+	"keywords": "JSON,Ethernet,Teensy",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:ktgilliam/LFAST_Comms.git"
+	},
+	"authors": {
+		"name": "Kevin Gilliam",
+		"email": "keving@arizona.edu"
+	},
+
+	"dependencies": [{
+			"name": "NativeEthernet",
+			"version": "git@github.com:vjmuzik/NativeEthernet.git"
+		},
+		{
+			"owner": "bblanchon",
+			"name": "StreamUtils",
+			"version": "^1.6.3"
+		},
+		{
+			"owner": "bblanchon",
+			"name": "ArduinoJson",
+			"version": "^6.19.4"
+		}
+	],
+	"frameworks": "arduino",
+	"platforms": "teensy",
+	"build": {
+		"flags": [
+			"-I include"
+		]
+	},
+	"headers": ["CommService.h", "NetComms,h"]
 }
