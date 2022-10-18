@@ -1,0 +1,29 @@
+{
+  "name": "LFAST_Comms",
+  "version": "1.0.0",
+  "description": "Communications client using Arduino's Client abstraction and a subset of the JSON standard",
+  "keywords": "JSON,Ethernet,Teensy",
+  "repository":
+  {
+    "type": "git",
+    "url": "git@github.com:ktgilliam/LFAST_Comms.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Kevin Gilliam",
+      "email": "keving@arizona.edu"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://www.helloworld.org/",
+  "dependencies":
+  {
+  	"name": "NativeEthernet",
+    	"version": "git@github.com:vjmuzik/NativeEthernet.git"
+  },
+  "frameworks": "Arduino",
+  "platforms": "teensy",
+  "headers": ["CommService.h", "NetComms,h"],
+  
+}
