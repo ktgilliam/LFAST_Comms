@@ -32,11 +32,10 @@ class CommsMessage
             std::memset(this->jsonInputBuffer, 0, sizeof(this->jsonInputBuffer));
             processed = false;
         }
-        virtual ~CommsMessage() {} // TEST_SERIAL.println("Destructor called."); delete[] msgBuff;}
+        virtual ~CommsMessage() {} 
         virtual void placeholder() {}
         void printMessageInfo();
         std::string getMessageStr();
-        // std::string MessageKey;
         StaticJsonDocument<JSON_PROGMEM_SIZE> &getJsonDoc()
         {
             return this->JsonDoc;
@@ -67,8 +66,6 @@ class CommsMessage
         StaticJsonDocument<JSON_PROGMEM_SIZE> JsonDoc;
         bool processed;
         std::string destKey;
-        // Client *client;
-        // char *msgBuff;
 };
 
 template <class T>

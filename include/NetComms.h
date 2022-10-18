@@ -20,21 +20,13 @@ namespace LFAST
         static IPAddress ip;
         static EthernetServer server;
         
-        // std::vector<NetCommsMessage *> netMessageQueue;
-        // std::vector<EthernetClient> enetClients;
-        // EthernetClient enetClients[MAX_CLIENTS];
         std::list<EthernetClient> enetClients;
-        // uint8_t connectedClients;
-        
     public:
         EthernetCommsService();
 
         // Overloaded functions:
 
         bool Status() { return this->commsServiceStatus; };
-        // bool checkForNewMessages(){return false;}
-        // bool checkForNewMessages(EthernetClient &client);
         bool checkForNewClients() override;
-        // virtual void sendMessage(CommsMessage<int> msg){};
     };
 }

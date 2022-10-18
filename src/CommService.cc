@@ -49,7 +49,6 @@ bool LFAST::CommsService::checkForNewClients()
     return (newClientFlag);
 }
 
-// void LFAST::CommsMessage::printMessageInfo() {}
 void LFAST::CommsService::checkForNewClientData()
 {
     // check for incoming data from all clients
@@ -64,14 +63,10 @@ void LFAST::CommsService::checkForNewClientData()
 
 bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 {
-    // static unsigned int msgCount = 0;
     // listen for incoming clients
     Client *client = connection.client;
     if (client)
     {
-        // Serial2.println("\r\n");
-        // Serial2.printf("\r\n%u:", msgCount++);
-        // CommsMessage newMsg;
         auto newMsg = new CommsMessage();
         unsigned int bytesRead = 0;
         bool readingObject = false, objectDone = false;
@@ -79,7 +74,6 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 
         while (client->connected())
         {
-            // Serial2.println("Checking connected client messages");
             if (client->available())
             {
                 char c = client->read();
@@ -97,15 +91,10 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                     if (openObjectsCnt == 0)
                         objectDone = true;
                 }
-                // Serial2.print(c);
                 if (objectDone)
                 {
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
-                    // Serial2.printf(" [%u bytes]\r\n", bytesRead);
-
                     connection.rxMessageQueue.push_back(newMsg);
-                    // Serial2.println("Received Message:");
-                    // newMsg->printMessageInfo();
                     break;
                 }
             }
@@ -117,7 +106,6 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 void LFAST::CommsMessage::printMessageInfo()
 {
     Serial2.printf("MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-    // Serial2.printf("\tMESSAGE Input Buffer: %s (%u bytes)\r\n", this->jsonInputBuffer, std::strlen(this->jsonInputBuffer));
     Serial2.print("MESSAGE Input Buffer: \033[0K");
 
     bool nullTermFound = false;
@@ -135,9 +123,6 @@ void LFAST::CommsMessage::printMessageInfo()
             Serial2.printf("%s[%u]\r\n", "\\0", ii);
         }
     }
-
-    // serializeJson(jsonDoc, Serial2);
-    // Serial2.printf("\tBytes: %u\r\n", measureJson(jsonDoc));
     Serial2.println("");
 }
 
@@ -169,11 +154,8 @@ void LFAST::CommsService::processMessage(CommsMessage *msg)
     JsonObject msgRoot = doc.as<JsonObject>();
     JsonObject msgObject = msgRoot["MountMessage"];
     // Test if parsing succeeds.
-
     for (JsonPair kvp : msgObject)
     {
-        // auto keyStr = kvp.key().c_str();
-        // Serial2.printf("Processing Key: %s\r\n", keyStr);
         this->callMessageHandler(kvp);
     }
     msg->setProcessedFlag();
@@ -234,8 +216,6 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 
 void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 {
-    // Serial2.println("Sending message:");
-    // msg.printMessageInfo();
     if (sendOpt == ACTIVE_CONNECTION)
     {
         WriteBufferingStream bufferedClient(*(activeConnection->client), std::strlen(msg.getBuffPtr()));
@@ -267,7 +247,6 @@ void LFAST::CommsService::stopDisconnectedClients()
     {
         if (!(*itr).client->connected())
         {
-            // Serial2.println("Disconnected client.");
             (*itr).client->stop();
             itr = connections.erase(itr);
         }
