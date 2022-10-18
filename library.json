@@ -17,13 +17,11 @@
   ],
   "license": "MIT",
   "homepage": "https://www.helloworld.org/",
-  "dependencies":
-  {
+  "dependencies":{
   	"name": "NativeEthernet",
     	"version": "git@github.com:vjmuzik/NativeEthernet.git"
   },
   "frameworks": "Arduino",
   "platforms": "teensy",
-  "headers": ["CommService.h", "NetComms,h"],
-  
+  "headers": ["CommService.h", "NetComms,h"]
 }
