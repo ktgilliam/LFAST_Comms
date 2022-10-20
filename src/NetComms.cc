@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 
-#ifdef TEENSY41
+#ifdef TEENSYDUINO
 #include <NativeEthernet.h>
 #else
 #include <SPI.h>
@@ -18,7 +18,6 @@
 #endif
 
 
-#include <debug.h>
 #include <array>
 #include <tuple>
 #include <iostream>
@@ -46,7 +45,7 @@ byte LFAST::EthernetCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 LFAST::EthernetCommsService::EthernetCommsService()
 {
     bool initResult = true;
-    TEST_SERIAL.println("Initializing Ethernet... ");
+    // Serial2.println("Initializing Ethernet... ");
     getTeensyMacAddr(mac);
     // initialize the Ethernet device
     Ethernet.begin(mac, ip);
@@ -55,14 +54,14 @@ LFAST::EthernetCommsService::EthernetCommsService()
     // Check for Ethernet hardware present
     if (Ethernet.hardwareStatus() == EthernetNoHardware)
     {
-        TEST_SERIAL.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
+        // Serial2.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
         initResult = false;
     }
 
-    // TEST_SERIAL.println("Checking Link...");
+    // Serial2.println("Checking Link...");
     if (Ethernet.linkStatus() == LinkOFF)
     {
-        TEST_SERIAL.println("Ethernet cable is not connected.");
+        // Serial2.println("Ethernet cable is not connected.");
         initResult = false;
     }
 
@@ -70,9 +69,9 @@ LFAST::EthernetCommsService::EthernetCommsService()
     {
         // start listening for clients
         this->server.begin(PORT);
-        TEST_SERIAL.print("Listening for connection on local IP: ");
-        TEST_SERIAL.print(Ethernet.localIP());
-        TEST_SERIAL.print("...");
+        // Serial2.print("Listening for connection on local IP: ");
+        // Serial2.print(Ethernet.localIP());
+        // Serial2.print("...");
     }
     this->commsServiceStatus = initResult;
 }
@@ -85,7 +84,7 @@ bool LFAST::EthernetCommsService::checkForNewClients()
     if (newClient)
     {
         newClientFlag = true;
-        TEST_SERIAL.printf("Connection # %d Made.\r\n", connections.size() + 1);
+        // Serial2.printf("Connection # %d Made.\r\n", connections.size() + 1);
         // Once we "accept", the client is no longer tracked by EthernetServer
         // so we must store it into our list of clients
         enetClients.push_back(newClient);
