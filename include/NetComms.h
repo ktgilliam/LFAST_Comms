@@ -6,7 +6,7 @@
 
 #include "CommService.h"
 
-#define PORT 4400
+#define DEFAULT_PORT 4400
 
 
 #define MAX_CLIENTS 4
@@ -19,11 +19,12 @@ namespace LFAST
         static byte mac[6];
         static IPAddress ip;
         static EthernetServer server;
+        static uint16_t port;
         
         std::list<EthernetClient> enetClients;
     public:
         EthernetCommsService();
-
+        EthernetCommsService(char* ip, unsigned int port);
         // Overloaded functions:
 
         bool Status() { return this->commsServiceStatus; };

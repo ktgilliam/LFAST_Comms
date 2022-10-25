@@ -17,13 +17,13 @@
 #include <Ethernet.h>
 #endif
 
-
 #include <array>
 #include <tuple>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <stdlib.h>     /* atoi */
 
 #include <vector>
 #include <iterator>
@@ -34,17 +34,31 @@
 
 void stopDisconnectedClients();
 void getTeensyMacAddr(uint8_t *mac);
+IPAddress parseIpAddress(char *addrStr);
 
-IPAddress LFAST::EthernetCommsService::ip = IPAddress(192, 168, 121, 177);
-EthernetServer LFAST::EthernetCommsService::server = EthernetServer(PORT);
+const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
+const uint16_t defaultPort = DEFAULT_PORT;
+
+LFAST::EthernetCommsService::port = defaultPort;
+IPAddress LFAST::EthernetCommsService::ip = defaultIp;
+EthernetServer LFAST::EthernetCommsService::server = EthernetServer();
+
 byte LFAST::EthernetCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+EthernetCommsService(char *pIp, unsigned int port)
+{
+    FAST::EthernetCommsService::ip = parseIpAddress(pIp);
+    LFAST::EthernetCommsService::port = port;
+    EthernetCommsService();
+}
+
 LFAST::EthernetCommsService::EthernetCommsService()
 {
     bool initResult = true;
+
     // Serial2.println("Initializing Ethernet... ");
     getTeensyMacAddr(mac);
     // initialize the Ethernet device
@@ -93,8 +107,6 @@ bool LFAST::EthernetCommsService::checkForNewClients()
     return (newClientFlag);
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// LOCAL/PRIVATE FUNCTIONS ////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,4 +117,18 @@ void LFAST::EthernetCommsService::getTeensyMacAddr(uint8_t *mac)
         mac[by] = (HW_OCOTP_MAC1 >> ((1 - by) * 8)) & 0xFF;
     for (uint8_t by = 0; by < 4; by++)
         mac[by + 2] = (HW_OCOTP_MAC0 >> ((3 - by) * 8)) & 0xFF;
+}
+
+IPAddress parseIpAddress(char *addrStr)
+{
+    char *pch;
+    uint16_t ipParts[] = {0,0,0,0};
+    pch = strtok(addrStr, ".");
+    uint16_t idx = 0;
+    while (pch != NULL)
+    {
+        pch = std::strtok(NULL, ".");
+        ipParts(idx++) = std::atoi(pch);
+    }
+    return IPAddress(ipParts[0], ipParts[1], ipParts[2], ipParts[3]);
 }
