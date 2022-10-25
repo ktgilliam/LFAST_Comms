@@ -17,13 +17,13 @@
 #include <Ethernet.h>
 #endif
 
-
 #include <array>
 #include <tuple>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <stdlib.h> /* atoi */
 
 #include <vector>
 #include <iterator>
@@ -34,17 +34,36 @@
 
 void stopDisconnectedClients();
 void getTeensyMacAddr(uint8_t *mac);
+IPAddress parseIpAddress(byte *bytes);
 
-IPAddress LFAST::EthernetCommsService::ip = IPAddress(192, 168, 121, 177);
-EthernetServer LFAST::EthernetCommsService::server = EthernetServer(PORT);
+// const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
+// const uint16_t defaultPort = DEFAULT_PORT;
+
+uint16_t LFAST::EthernetCommsService::port = 0;
+IPAddress LFAST::EthernetCommsService::ip = IPAddress(0, 0, 0, 0);
+EthernetServer LFAST::EthernetCommsService::server = EthernetServer();
+
 byte LFAST::EthernetCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+LFAST::EthernetCommsService::EthernetCommsService(byte *ipBytes, uint16_t _port)
+{
+    EthernetCommsService::ip = IPAddress(ipBytes[0],ipBytes[1],ipBytes[2],ipBytes[3]);
+    EthernetCommsService::port = _port;
+    this->commsServiceStatus = initializeEnetIface();
+}
+
 LFAST::EthernetCommsService::EthernetCommsService()
 {
+    this->commsServiceStatus = initializeEnetIface();
+}
+
+bool LFAST::EthernetCommsService::initializeEnetIface()
+{
     bool initResult = true;
+    EthernetCommsService::server = EthernetServer(EthernetCommsService::port);
     // Serial2.println("Initializing Ethernet... ");
     getTeensyMacAddr(mac);
     // initialize the Ethernet device
@@ -57,23 +76,7 @@ LFAST::EthernetCommsService::EthernetCommsService()
         // Serial2.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
         initResult = false;
     }
-
-    // Serial2.println("Checking Link...");
-    if (Ethernet.linkStatus() == LinkOFF)
-    {
-        // Serial2.println("Ethernet cable is not connected.");
-        initResult = false;
-    }
-
-    if (initResult)
-    {
-        // start listening for clients
-        this->server.begin(PORT);
-        // Serial2.print("Listening for connection on local IP: ");
-        // Serial2.print(Ethernet.localIP());
-        // Serial2.print("...");
-    }
-    this->commsServiceStatus = initResult;
+    return initResult;
 }
 
 bool LFAST::EthernetCommsService::checkForNewClients()
@@ -92,8 +95,6 @@ bool LFAST::EthernetCommsService::checkForNewClients()
     }
     return (newClientFlag);
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// LOCAL/PRIVATE FUNCTIONS ////////////////////////////////////////////////////

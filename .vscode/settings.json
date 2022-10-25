@@ -2,6 +2,14 @@
     "files.associations": {
         "cstdint": "cpp",
         "unordered_map": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "sstream": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "cstddef": "cpp"
     }
 }
