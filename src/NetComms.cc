@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
-#include <stdlib.h>     /* atoi */
+#include <stdlib.h> /* atoi */
 
 #include <vector>
 #include <iterator>
@@ -34,13 +34,13 @@
 
 void stopDisconnectedClients();
 void getTeensyMacAddr(uint8_t *mac);
-IPAddress parseIpAddress(char *addrStr);
+IPAddress parseIpAddress(byte *bytes);
 
-const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
-const uint16_t defaultPort = DEFAULT_PORT;
+// const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
+// const uint16_t defaultPort = DEFAULT_PORT;
 
-LFAST::EthernetCommsService::port = defaultPort;
-IPAddress LFAST::EthernetCommsService::ip = defaultIp;
+uint16_t LFAST::EthernetCommsService::port = 0;
+IPAddress LFAST::EthernetCommsService::ip = IPAddress(0, 0, 0, 0);
 EthernetServer LFAST::EthernetCommsService::server = EthernetServer();
 
 byte LFAST::EthernetCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
@@ -48,17 +48,22 @@ byte LFAST::EthernetCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-EthernetCommsService(char *pIp, unsigned int port)
+LFAST::EthernetCommsService::EthernetCommsService(byte *ipBytes, uint16_t _port)
 {
-    FAST::EthernetCommsService::ip = parseIpAddress(pIp);
-    LFAST::EthernetCommsService::port = port;
-    EthernetCommsService();
+    EthernetCommsService::ip = IPAddress(ipBytes[0],ipBytes[1],ipBytes[2],ipBytes[3]);
+    EthernetCommsService::port = _port;
+    this->commsServiceStatus = initializeEnetIface();
 }
 
 LFAST::EthernetCommsService::EthernetCommsService()
 {
-    bool initResult = true;
+    this->commsServiceStatus = initializeEnetIface();
+}
 
+bool LFAST::EthernetCommsService::initializeEnetIface()
+{
+    bool initResult = true;
+    EthernetCommsService::server = EthernetServer(EthernetCommsService::port);
     // Serial2.println("Initializing Ethernet... ");
     getTeensyMacAddr(mac);
     // initialize the Ethernet device
@@ -71,23 +76,7 @@ LFAST::EthernetCommsService::EthernetCommsService()
         // Serial2.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
         initResult = false;
     }
-
-    // Serial2.println("Checking Link...");
-    if (Ethernet.linkStatus() == LinkOFF)
-    {
-        // Serial2.println("Ethernet cable is not connected.");
-        initResult = false;
-    }
-
-    if (initResult)
-    {
-        // start listening for clients
-        this->server.begin(PORT);
-        // Serial2.print("Listening for connection on local IP: ");
-        // Serial2.print(Ethernet.localIP());
-        // Serial2.print("...");
-    }
-    this->commsServiceStatus = initResult;
+    return initResult;
 }
 
 bool LFAST::EthernetCommsService::checkForNewClients()
@@ -117,18 +106,4 @@ void LFAST::EthernetCommsService::getTeensyMacAddr(uint8_t *mac)
         mac[by] = (HW_OCOTP_MAC1 >> ((1 - by) * 8)) & 0xFF;
     for (uint8_t by = 0; by < 4; by++)
         mac[by + 2] = (HW_OCOTP_MAC0 >> ((3 - by) * 8)) & 0xFF;
-}
-
-IPAddress parseIpAddress(char *addrStr)
-{
-    char *pch;
-    uint16_t ipParts[] = {0,0,0,0};
-    pch = strtok(addrStr, ".");
-    uint16_t idx = 0;
-    while (pch != NULL)
-    {
-        pch = std::strtok(NULL, ".");
-        ipParts(idx++) = std::atoi(pch);
-    }
-    return IPAddress(ipParts[0], ipParts[1], ipParts[2], ipParts[3]);
 }
