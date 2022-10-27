@@ -5,6 +5,7 @@
 #include <deque>
 #include <string>
 #include <vector>
+
 #define CLI_BUFF_LENGTH 90
 
 #define RED "\033[31m"

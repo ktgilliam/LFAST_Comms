@@ -74,7 +74,7 @@ void TerminalInterface::serviceCLI()
     cursorToRowCol(SERVICE_COUNTER_ROW, 0);
     serial->printf("[%o]", serviceCounter++);
 #endif
-    static int64_t cnt =0;
+    // static int64_t cnt =0;
     cursorToRowCol(promptRow, currentInputCol);
     if (serial->available() > 0)
     {
@@ -96,7 +96,7 @@ void TerminalInterface::serviceCLI()
                 currentInputCol++;
             }
         }
-        cnt = 0;
+        // cnt = 0;
     }
     // else
     // {
