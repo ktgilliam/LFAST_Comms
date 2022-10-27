@@ -112,7 +112,6 @@ class CommsService
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
         bool commsServiceStatus;
-
     private:
         enum HandlerType
         {
