@@ -52,7 +52,6 @@ LFAST::TcpCommsService::TcpCommsService(byte *ipBytes)
 
 LFAST::TcpCommsService::TcpCommsService()
 {
-    port = 0;
     ip = IPAddress(0, 0, 0, 0);
     // this->commsServiceStatus = initializeEnetIface();
 }
@@ -60,7 +59,7 @@ LFAST::TcpCommsService::TcpCommsService()
 bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
 {
     bool initResult = true;
-    tcpServer = new EthernetServer(TcpCommsService::port);
+    tcpServer = new EthernetServer(_port);
 
     if (!hardwareConfigurationDone)
     {
