@@ -31,9 +31,9 @@ namespace LFAST
         std::list<EthernetClient> enetClients;
     public:
         TcpCommsService();
-        TcpCommsService(byte *, uint16_t);
+        TcpCommsService(byte *);
 
-        bool initializeEnetIface();
+        bool initializeEnetIface(uint16_t);
 
         bool Status() { return this->commsServiceStatus; };
         bool checkForNewClients() override;

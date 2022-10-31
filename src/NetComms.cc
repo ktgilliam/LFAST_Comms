@@ -45,22 +45,19 @@ byte LFAST::TcpCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-LFAST::TcpCommsService::TcpCommsService(byte *ipBytes, uint16_t _port)
+LFAST::TcpCommsService::TcpCommsService(byte *ipBytes)
 {
     ip = IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]);
-    port = _port;
-
-    this->commsServiceStatus = initializeEnetIface();
 }
 
 LFAST::TcpCommsService::TcpCommsService()
 {
     port = 0;
     ip = IPAddress(0, 0, 0, 0);
-    this->commsServiceStatus = initializeEnetIface();
+    // this->commsServiceStatus = initializeEnetIface();
 }
 
-bool LFAST::TcpCommsService::initializeEnetIface()
+bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
 {
     bool initResult = true;
     tcpServer = new EthernetServer(TcpCommsService::port);
@@ -81,7 +78,8 @@ bool LFAST::TcpCommsService::initializeEnetIface()
         }
         hardwareConfigurationDone = true;
     }
-    return initResult;
+    if(initResult) commsServiceStatus = true;
+    return commsServiceStatus;
 }
 
 bool LFAST::TcpCommsService::checkForNewClients()
