@@ -36,54 +36,59 @@ void stopDisconnectedClients();
 void getTeensyMacAddr(uint8_t *mac);
 IPAddress parseIpAddress(byte *bytes);
 
+bool LFAST::TcpCommsService::hardwareConfigurationDone = false;
 // const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
 // const uint16_t defaultPort = DEFAULT_PORT;
 
-uint16_t LFAST::EthernetCommsService::port = 0;
-IPAddress LFAST::EthernetCommsService::ip = IPAddress(0, 0, 0, 0);
-EthernetServer LFAST::EthernetCommsService::server = EthernetServer();
-
-byte LFAST::EthernetCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte LFAST::TcpCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-LFAST::EthernetCommsService::EthernetCommsService(byte *ipBytes, uint16_t _port)
+LFAST::TcpCommsService::TcpCommsService(byte *ipBytes, uint16_t _port)
 {
-    EthernetCommsService::ip = IPAddress(ipBytes[0],ipBytes[1],ipBytes[2],ipBytes[3]);
-    EthernetCommsService::port = _port;
+    ip = IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]);
+    port = _port;
+
     this->commsServiceStatus = initializeEnetIface();
 }
 
-LFAST::EthernetCommsService::EthernetCommsService()
+LFAST::TcpCommsService::TcpCommsService()
 {
+    port = 0;
+    ip = IPAddress(0, 0, 0, 0);
     this->commsServiceStatus = initializeEnetIface();
 }
 
-bool LFAST::EthernetCommsService::initializeEnetIface()
+bool LFAST::TcpCommsService::initializeEnetIface()
 {
     bool initResult = true;
-    EthernetCommsService::server = EthernetServer(EthernetCommsService::port);
-    // Serial2.println("Initializing Ethernet... ");
-    getTeensyMacAddr(mac);
-    // initialize the Ethernet device
-    Ethernet.begin(mac, ip);
-    // Ethernet.begin(mac, ip, myDns, gateway, subnet)
+    tcpServer = new EthernetServer(TcpCommsService::port);
 
-    // Check for Ethernet hardware present
-    if (Ethernet.hardwareStatus() == EthernetNoHardware)
+    if (!hardwareConfigurationDone)
     {
-        // Serial2.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
-        initResult = false;
+        // Serial2.println("Initializing Ethernet... ");
+        getTeensyMacAddr(mac);
+        // initialize the Ethernet device
+        Ethernet.begin(mac, ip);
+        // Ethernet.begin(mac, ip, myDns, gateway, subnet)
+
+        // Check for Ethernet hardware present
+        if (Ethernet.hardwareStatus() == EthernetNoHardware)
+        {
+            // Serial2.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
+            initResult = false;
+        }
+        hardwareConfigurationDone = true;
     }
     return initResult;
 }
 
-bool LFAST::EthernetCommsService::checkForNewClients()
+bool LFAST::TcpCommsService::checkForNewClients()
 {
     bool newClientFlag = false;
     // check for any new client connecting, and say hello (before any incoming data)
-    EthernetClient newClient = server.accept();
+    EthernetClient newClient = tcpServer->accept();
     if (newClient)
     {
         newClientFlag = true;
@@ -100,7 +105,7 @@ bool LFAST::EthernetCommsService::checkForNewClients()
 ////////////////////////// LOCAL/PRIVATE FUNCTIONS ////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LFAST::EthernetCommsService::getTeensyMacAddr(uint8_t *mac)
+void LFAST::TcpCommsService::getTeensyMacAddr(uint8_t *mac)
 {
     for (uint8_t by = 0; by < 2; by++)
         mac[by] = (HW_OCOTP_MAC1 >> ((1 - by) * 8)) & 0xFF;
