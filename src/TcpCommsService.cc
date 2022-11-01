@@ -6,7 +6,7 @@
 ///  @ Description:
 ///
 
-#include "../include/NetComms.h"
+#include "../include/TcpCommsService.h"
 
 #include <Arduino.h>
 

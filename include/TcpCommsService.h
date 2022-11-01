@@ -25,7 +25,6 @@ namespace LFAST
         void getTeensyMacAddr(uint8_t *mac);
         static byte mac[6];
         IPAddress ip;
-        uint16_t port;
         EthernetServer *tcpServer;
 
         std::list<EthernetClient> enetClients;
