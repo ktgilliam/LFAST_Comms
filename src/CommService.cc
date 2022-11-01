@@ -126,7 +126,7 @@ void LFAST::CommsMessage::printMessageInfo()
     Serial2.println("");
 }
 
-void LFAST::CommsService::processClientData()
+void LFAST::CommsService::processClientData(const std::string &destFilter = "")
 {
     for (auto &conn : this->connections)
     {
@@ -134,24 +134,26 @@ void LFAST::CommsService::processClientData()
         auto itr = conn.rxMessageQueue.begin();
         while (itr != conn.rxMessageQueue.end())
         {
-            processMessage(*itr);
+            processMessage(*itr, destFilter);
             delete *itr;
             itr = conn.rxMessageQueue.erase(itr);
         }
     }
     this->activeConnection = nullptr;
 }
-void LFAST::CommsService::processMessage(CommsMessage *msg)
+
+void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &destFilter)
 {
     if (msg->hasBeenProcessed())
     {
         Serial2.println("Something went wrong processing messages.");
         return;
     }
-    
+
     StaticJsonDocument<JSON_PROGMEM_SIZE> &doc = msg->deserialize();
     JsonObject msgRoot = doc.as<JsonObject>();
-    JsonObject msgObject = msgRoot["MountMessage"];
+    if (!destFilter.empty())
+        JsonObject msgObject = msgRoot[destFilter];
     // Test if parsing succeeds.
     for (JsonPair kvp : msgObject)
     {
