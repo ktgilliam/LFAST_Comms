@@ -153,9 +153,9 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
     StaticJsonDocument<JSON_PROGMEM_SIZE> &doc = msg->deserialize();
     JsonObject msgRoot = doc.as<JsonObject>();
     if (!destFilter.empty())
-        JsonObject msgObject = msgRoot[destFilter];
+        msgRoot = msgRoot[destFilter];
     // Test if parsing succeeds.
-    for (JsonPair kvp : msgObject)
+    for (JsonPair kvp : msgRoot)
     {
         this->callMessageHandler(kvp);
     }
