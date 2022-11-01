@@ -35,5 +35,5 @@
 			"-D TEENSY41"
 		]
 	},
-	"headers": ["CommService.h", "NetComms,h"]
+	"headers": ["CommService.h", "TcpCommsService.h"]
 }
