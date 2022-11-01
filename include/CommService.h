@@ -154,8 +154,8 @@ class CommsService
         void checkForNewClientData();
         virtual bool checkForNewClients();
         virtual void stopDisconnectedClients();
-        virtual void processClientData();
-        virtual void processMessage(CommsMessage *);
+        virtual void processClientData(const std::string &);
+        virtual void processMessage(CommsMessage *, const std::string &);
         void setNoReplyFlag(bool f)
         {
             activeConnection->noReplyFlag = f;
