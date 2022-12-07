@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 #include <cinttypes>
-#include <mathFuncs.h>
+// #include <mathFuncs.h>
 #include <cstring>
 
 // #include <patch.h>
