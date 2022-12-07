@@ -49,16 +49,18 @@ bool LFAST::CommsService::checkForNewClients()
     return (newClientFlag);
 }
 
-void LFAST::CommsService::checkForNewClientData()
+bool LFAST::CommsService::checkForNewClientData()
 {
+    bool newMsgFlag = false;
     // check for incoming data from all clients
     for (auto &connection : this->connections)
     {
         if (connection.client->available())
         {
-            getNewMessages(connection);
+            newMsgFlag = getNewMessages(connection);
         }
     }
+    return newMsgFlag;
 }
 
 bool LFAST::CommsService::getNewMessages(ClientConnection &connection)

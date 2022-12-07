@@ -151,7 +151,7 @@ class CommsService
             return commsServiceStatus;
         };
 
-        void checkForNewClientData();
+        bool checkForNewClientData();
         virtual bool checkForNewClients();
         virtual void stopDisconnectedClients();
         virtual void processClientData(const std::string &);
