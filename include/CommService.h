@@ -1,5 +1,5 @@
 #pragma once
-
+#include "LFAST_Device.h"
 #include <Arduino.h>
 #include <StreamUtils.h>
 #include "Client.h"
@@ -103,7 +103,8 @@ struct ClientConnection
     std::vector<CommsMessage*> rxMessageQueue;
     std::vector<CommsMessage*> txMessageQueue;
 };
-class CommsService
+
+class CommsService : public LFAST_Device
 {
 
     protected:
