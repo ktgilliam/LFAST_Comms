@@ -38,8 +38,10 @@ void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
     std::stringstream ss;
     if (cli != nullptr)
     {
-        char msgBuff[100]{0};
-        sprintf(msgBuff, "Invalid Message: %s", msg.getMessageStr());
+        char debugMsgBuff[100+JSON_PROGMEM_SIZE]{0};
+        char msgBuff[JSON_PROGMEM_SIZE]{0};
+        msg.getMessageStr(msgBuff);
+        sprintf(debugMsgBuff, "Invalid Message: %s", msgBuff);
         cli->addDebugMessage(msgBuff);
     }
 }
@@ -100,7 +102,7 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
                     if (cli != nullptr)
                     {
-                        cli->updatePersistentField(MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
+                        cli->updatePersistentField(RAW_MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
                     }
                     connection.rxMessageQueue.push_back(newMsg);
                     break;
@@ -111,7 +113,7 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
     return true;
 }
 
-void LFAST::CommsMessage::printMessageInfo(TerminalInterface * debugCli)
+void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
 {
     if (debugCli != nullptr)
     {
@@ -176,12 +178,20 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
     if (!destFilter.empty())
         msgRoot = msgRoot[destFilter];
     // Test if parsing succeeds.
+    if (cli != nullptr)
+    {
+        StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = msgRoot;
+        char printBuff[JSON_PROGMEM_SIZE]{0};
+        serializeJson(docCopy, printBuff, JSON_PROGMEM_SIZE);
+        cli->updatePersistentField(PROCESSED_MESSAGE_ROW, printBuff);
+    }
     for (JsonPair kvp : msgRoot)
     {
         this->callMessageHandler(kvp);
     }
     msg->setProcessedFlag();
 }
+
 
 bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 {
@@ -240,15 +250,16 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 {
     if (sendOpt == ACTIVE_CONNECTION)
     {
+        if (cli != nullptr)
+        {
+            char msgBuff[JSON_PROGMEM_SIZE]{0};
+            msg.getMessageStr(msgBuff);
+            cli->updatePersistentField(MESSAGE_SENT_ROW, msgBuff);
+        }
         WriteBufferingStream bufferedClient(*(activeConnection->client), std::strlen(msg.getBuffPtr()));
         serializeJson(msg.getJsonDoc(), bufferedClient);
         bufferedClient.flush();
         activeConnection->client->write('\0');
-        if (cli != nullptr)
-        {
-            cli->addDebugMessage("trying to print sent message...");
-            cli->updatePersistentField(MESSAGE_SENT_ROW, msg.getBuffPtr());
-        }
     }
     else
     {
@@ -259,7 +270,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     }
 }
 
-StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(TerminalInterface * debugCli)
+StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(TerminalInterface *debugCli)
 {
     DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
     if (error)
@@ -267,12 +278,19 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(Terminal
         if (debugCli != nullptr)
         {
             char msgBuff[100]{0};
-            sprintf(msgBuff, "deserializeJson() failed: %s", error.f_str());
+            sprintf(msgBuff, "deserializeJson() failed: %s", error.c_str());
             debugCli->addDebugMessage(msgBuff);
         }
     }
     return this->JsonDoc;
 }
+
+void LFAST::CommsMessage::getMessageStr(char *buff)
+{
+    StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = this->JsonDoc;
+    serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
+}
+
 void LFAST::CommsService::stopDisconnectedClients()
 {
     auto itr = connections.begin();
@@ -294,7 +312,9 @@ void LFAST::CommsService::setupPersistentFields()
 {
     cli->addPersistentField("COMMS STATUS", COMMS_SERVICE_STATUS_ROW);
 
-    cli->addPersistentField("RECEIVED MESSAGE", MESSAGE_RECEIVED_ROW);
+    cli->addPersistentField("RAW RECEIVED", RAW_MESSAGE_RECEIVED_ROW);
+
+    cli->addPersistentField("PROCESSED RECEIVED", PROCESSED_MESSAGE_ROW);
 
     cli->addPersistentField("SENT MESSAGE", MESSAGE_SENT_ROW);
 }

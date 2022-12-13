@@ -23,7 +23,8 @@
 enum COMMS_SERVICE_INFO_ROWS
 {
     COMMS_SERVICE_STATUS_ROW,
-    MESSAGE_RECEIVED_ROW,
+    RAW_MESSAGE_RECEIVED_ROW,
+    PROCESSED_MESSAGE_ROW,
     MESSAGE_SENT_ROW
 //     // PROMPT_ROW,
 //     // PROMPT_FEEDBACK,
@@ -48,7 +49,7 @@ class CommsMessage
         virtual ~CommsMessage() {} 
         virtual void placeholder() {}
         void printMessageInfo(TerminalInterface * debugCli=nullptr);
-        std::string getMessageStr();
+        void getMessageStr(char *);
         StaticJsonDocument<JSON_PROGMEM_SIZE> &getJsonDoc()
         {
             return this->JsonDoc;
