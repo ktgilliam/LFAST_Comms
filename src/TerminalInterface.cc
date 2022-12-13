@@ -18,12 +18,12 @@
 TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint16_t _baud=230400)
     : serial(_serial), ifLabel(_label)
 {
+    serial->begin(_baud);
     clearConsole();
     debugRowOffset = 0;
     debugMessageCount = 0;
     promptRow = LFAST::NUM_HEADER_ROWS + 1;
     printHeader();
-    serial->begin(_baud);
     // resetPrompt();
 };
 

@@ -28,14 +28,14 @@
 
 #if defined(ENABLE_TERMINAL) && !defined(TEST_SERIAL_NO)
 #warning "Terminal enabled but test serial not defined."
-#warning "Define TEST_SERIAL_NO in build flags.
+#warning "Define TEST_SERIAL_NO in build flags."
 #warning "Defaulting to Hardware serial #2 at 230400 bps."
 #define TEST_SERIAL_NO 2
 #endif
 
 #if defined(ENABLE_TERMINAL) && !defined(TEST_SERIAL_BAUD)
 #warning "Terminal enabled but test serial not defined."
-#warning "Define TEST_SERIAL_BAUD in build flags.
+#warning "Define TEST_SERIAL_BAUD in build flags."
 #warning "Defaulting to Hardware serial #2 at 230400 bps."
 #define TEST_SERIAL_BAUD 230400
 #endif
