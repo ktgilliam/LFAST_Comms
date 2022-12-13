@@ -111,37 +111,37 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
     return true;
 }
 
-void LFAST::CommsMessage::printMessageInfo()
+void LFAST::CommsMessage::printMessageInfo(TerminalInterface * debugCli)
 {
-    // if (cli != nullptr)
-    // {
-    //     char msgBuff[100]{0};
+    if (debugCli != nullptr)
+    {
+        char msgBuff[100]{0};
 
-    //     sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-    //     cli->addDebugMessage(msgBuff);
-    //     std::memset(msgBuff, 0, sizeof(msgBuff));
+        sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
+        debugCli->addDebugMessage(msgBuff);
+        std::memset(msgBuff, 0, sizeof(msgBuff));
 
-    //     sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
-    //     cli->addDebugMessage(msgBuff);
-    //     std::memset(msgBuff, 0, sizeof(msgBuff));
+        sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
+        debugCli->addDebugMessage(msgBuff);
+        std::memset(msgBuff, 0, sizeof(msgBuff));
 
-    //     // bool nullTermFound = false;
-    //     // unsigned int ii = 0;
-    //     // while (!nullTermFound && ii < JSON_PROGMEM_SIZE)
-    //     // {
-    //     //     char c2 = this->jsonInputBuffer[ii++];
-    //     //     if (c2 != '\0')
-    //     //     {
-    //     //         Serial2.printf("%c", c2);
-    //     //     }
-    //     //     else
-    //     //     {
-    //     //         nullTermFound = true;
-    //     //         Serial2.printf("%s[%u]\r\n", "\\0", ii);
-    //     //     }
-    //     // }
-    //     // Serial2.println("");
-    // }
+        // bool nullTermFound = false;
+        // unsigned int ii = 0;
+        // while (!nullTermFound && ii < JSON_PROGMEM_SIZE)
+        // {
+        //     char c2 = this->jsonInputBuffer[ii++];
+        //     if (c2 != '\0')
+        //     {
+        //         Serial2.printf("%c", c2);
+        //     }
+        //     else
+        //     {
+        //         nullTermFound = true;
+        //         Serial2.printf("%s[%u]\r\n", "\\0", ii);
+        //     }
+        // }
+        // Serial2.println("");
+    }
 }
 
 void LFAST::CommsService::processClientData(const std::string &destFilter = "")
@@ -259,16 +259,16 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     }
 }
 
-StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize()
+StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(TerminalInterface * debugCli)
 {
     DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
     if (error)
     {
-        if (cli != nullptr)
+        if (debugCli != nullptr)
         {
             char msgBuff[100]{0};
             sprintf(msgBuff, "deserializeJson() failed: %s", error.f_str());
-            cli->addDebugMessage(msgBuff);
+            debugCli->addDebugMessage(msgBuff);
         }
     }
     return this->JsonDoc;

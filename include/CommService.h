@@ -47,13 +47,13 @@ class CommsMessage
         }
         virtual ~CommsMessage() {} 
         virtual void placeholder() {}
-        void printMessageInfo();
+        void printMessageInfo(TerminalInterface * debugCli=nullptr);
         std::string getMessageStr();
         StaticJsonDocument<JSON_PROGMEM_SIZE> &getJsonDoc()
         {
             return this->JsonDoc;
         }
-        StaticJsonDocument<JSON_PROGMEM_SIZE> &deserialize();
+        StaticJsonDocument<JSON_PROGMEM_SIZE> &deserialize(TerminalInterface * debugCli=nullptr);
 
         template <typename T>
         inline T getValue(const std::string &key);
