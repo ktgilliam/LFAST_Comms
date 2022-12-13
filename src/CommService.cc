@@ -310,13 +310,15 @@ void LFAST::CommsService::stopDisconnectedClients()
 
 void LFAST::CommsService::setupPersistentFields()
 {
-    cli->addPersistentField("COMMS STATUS", COMMS_SERVICE_STATUS_ROW);
+    if (cli == nullptr)
+        return;
+    cli->addPersistentField(this->DeviceName,"[STATUS]", COMMS_SERVICE_STATUS_ROW);
 
-    cli->addPersistentField("RAW RECEIVED", RAW_MESSAGE_RECEIVED_ROW);
+    cli->addPersistentField(this->DeviceName,"[RAW RX]", RAW_MESSAGE_RECEIVED_ROW);
 
-    cli->addPersistentField("PROCESSED RECEIVED", PROCESSED_MESSAGE_ROW);
+    cli->addPersistentField(this->DeviceName,"[PROCESSED RX]", PROCESSED_MESSAGE_ROW);
 
-    cli->addPersistentField("SENT MESSAGE", MESSAGE_SENT_ROW);
+    cli->addPersistentField(this->DeviceName,"[TX]", MESSAGE_SENT_ROW);
 }
 
 // void LFAST::CommsService::updateStatusFields()
