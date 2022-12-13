@@ -153,7 +153,7 @@ void TerminalInterface::printDebugInfo()
 }
 void TerminalInterface::printPersistentFieldLabels()
 {
-    TEST_SERIAL.printf("Num fields:%d\r\n", persistentFields.size());
+    // TEST_SERIAL.printf("Num fields:%d\r\n", persistentFields.size());
 
     for (auto field : persistentFields)
     {
