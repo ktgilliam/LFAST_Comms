@@ -73,7 +73,7 @@ private:
     std::vector<PersistentTerminalField *> persistentFields;
 
 public:
-    TerminalInterface(const std::string &, HardwareSerial *);
+    TerminalInterface(const std::string &, HardwareSerial *, uint16_t);
 
     // void updateStatusFields(MountControl &);
     void serviceCLI();
