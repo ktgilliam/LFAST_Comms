@@ -37,7 +37,7 @@
 #warning "Terminal enabled but test serial not defined."
 #warning "Define TEST_SERIAL_BAUD in build flags."
 #warning "Defaulting to Hardware serial #2 at 230400 bps."
-#define TEST_SERIAL_BAUD 230400
+#define TEST_SERIAL_BAUD (uint32_t)230400
 #endif
 
 #define TEST_SERIAL SERIAL_CH(TEST_SERIAL_NO)
