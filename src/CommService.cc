@@ -96,6 +96,9 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                 if (objectDone)
                 {
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
+                    #if TERMINAL_ENABLED
+                    cli->updatePersistentField(MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
+                    #endif
                     connection.rxMessageQueue.push_back(newMsg);
                     break;
                 }
@@ -225,6 +228,9 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
         serializeJson(msg.getJsonDoc(), bufferedClient);
         bufferedClient.flush();
         activeConnection->client->write('\0');
+        #if TERMINAL_ENABLED
+        cli->updatePersistentField(MESSAGE_SENT_ROW, msg.getBuffPtr());
+        #endif
     }
     else
     {
@@ -259,3 +265,19 @@ void LFAST::CommsService::stopDisconnectedClients()
         }
     }
 }
+
+void LFAST::CommsService::setupPersistentFields()
+{
+    cli->addPersistentField("Comms Status", COMMS_SERVICE_STATUS_ROW);
+
+    cli->addPersistentField("RECEIVED MESSAGE", MESSAGE_RECEIVED_ROW);
+
+    cli->addPersistentField("SENT MESSAGE", MESSAGE_SENT_ROW);
+}
+
+// void LFAST::CommsService::updateStatusFields()
+// {
+//     cli->updatePersistentField(COMMS_SERVICE_STATUS_ROW, "Status not set up yet");
+//     cli->updatePersistentField(MESSAGE_RECEIVED_ROW, "Status not set up yet");
+//     cli->updatePersistentField(MESSAGE_SENT_ROW, "Status not set up yet");
+// }

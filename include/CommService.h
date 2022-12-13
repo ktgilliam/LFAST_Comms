@@ -20,6 +20,19 @@
 
 #define MAX_CTRL_MESSAGES 0x40U // can be increased if needed
 
+enum COMMS_SERVICE_INFO_ROWS
+{
+    COMMS_SERVICE_STATUS_ROW,
+    MESSAGE_RECEIVED_ROW,
+    MESSAGE_SENT_ROW
+//     // PROMPT_ROW,
+//     // PROMPT_FEEDBACK,
+// #if PRINT_SERVICE_COUNTER
+//     SERVICE_COUNTER_ROW,
+// #endif
+//     DEBUG_BORDER_1,
+//     DEBUG_MESSAGE_ROW
+};
 namespace LFAST
 {
 ///////////////// TYPES /////////////////
@@ -113,7 +126,7 @@ class CommsService : public LFAST_Device
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
         bool commsServiceStatus;
-        virtual void setupPersistentFields(){}
+        virtual void setupPersistentFields() override;
         
     private:
         enum HandlerType
@@ -136,7 +149,7 @@ class CommsService : public LFAST_Device
     public:
         CommsService();
         virtual ~CommsService() {}
-
+        
         void setupClientMessageBuffers(Client *client);
         bool getNewMessages(ClientConnection &);
         enum
