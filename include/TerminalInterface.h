@@ -5,6 +5,7 @@
 #include <deque>
 #include <string>
 #include <vector>
+#include <map>
 
 #define CLI_BUFF_LENGTH 90
 
@@ -39,7 +40,7 @@ namespace LFAST
         NUM_HEADER_ROWS
     };
 
-    const unsigned int MAX_DEBUG_ROWS = 10;
+    const unsigned int MAX_DEBUG_ROWS = 15;
     const unsigned int MAX_CLOCKBUFF_LEN = 64;
 }
 
@@ -71,17 +72,19 @@ private:
     std::string ifLabel;
     uint16_t fieldStartCol = 5;
     std::vector<PersistentTerminalField *> persistentFields;
-
+    std::map<std::string, uint8_t> senderRowOffsetMap;
+    uint16_t highestFieldRowNum;
 public:
-    TerminalInterface(const std::string &, HardwareSerial *);
+    TerminalInterface(const std::string &, HardwareSerial *, uint32_t);
 
+    void registerDevice(const std::string &);
     // void updateStatusFields(MountControl &);
     void serviceCLI();
     // void addDebugMessage(std::string&, uint8_t);
     void addDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
     // void clearDebugMessages();
     void printHeader();
-    void addPersistentField(const std::string &label, uint8_t printRow);
+    void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);
 
     void updatePersistentField(uint8_t printRow, const std::string &fieldValStr);
     void printPersistentFieldLabels();
@@ -107,6 +110,7 @@ public:
     inline void hideCursor() { serial->printf("\033[?25l"); }
     inline void showCursor() { serial->printf("\033[?25h"); }
     // clang-format on
+    void printDebugInfo();
 };
 
 int fs_sexa(char *out, double a, int w, int fracbase);

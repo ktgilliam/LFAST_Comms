@@ -1,5 +1,5 @@
 #pragma once
-
+#include "LFAST_Device.h"
 #include <Arduino.h>
 #include <StreamUtils.h>
 #include "Client.h"
@@ -20,6 +20,20 @@
 
 #define MAX_CTRL_MESSAGES 0x40U // can be increased if needed
 
+enum COMMS_SERVICE_INFO_ROWS
+{
+    COMMS_SERVICE_STATUS_ROW,
+    RAW_MESSAGE_RECEIVED_ROW,
+    PROCESSED_MESSAGE_ROW,
+    MESSAGE_SENT_ROW
+//     // PROMPT_ROW,
+//     // PROMPT_FEEDBACK,
+// #if PRINT_SERVICE_COUNTER
+//     SERVICE_COUNTER_ROW,
+// #endif
+//     DEBUG_BORDER_1,
+//     DEBUG_MESSAGE_ROW
+};
 namespace LFAST
 {
 ///////////////// TYPES /////////////////
@@ -34,13 +48,13 @@ class CommsMessage
         }
         virtual ~CommsMessage() {} 
         virtual void placeholder() {}
-        void printMessageInfo();
-        std::string getMessageStr();
+        void printMessageInfo(TerminalInterface * debugCli=nullptr);
+        void getMessageStr(char *);
         StaticJsonDocument<JSON_PROGMEM_SIZE> &getJsonDoc()
         {
             return this->JsonDoc;
         }
-        StaticJsonDocument<JSON_PROGMEM_SIZE> &deserialize();
+        StaticJsonDocument<JSON_PROGMEM_SIZE> &deserialize(TerminalInterface * debugCli=nullptr);
 
         template <typename T>
         inline T getValue(const std::string &key);
@@ -103,7 +117,8 @@ struct ClientConnection
     std::vector<CommsMessage*> rxMessageQueue;
     std::vector<CommsMessage*> txMessageQueue;
 };
-class CommsService
+
+class CommsService : public LFAST_Device
 {
 
     protected:
@@ -112,6 +127,8 @@ class CommsService
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
         bool commsServiceStatus;
+        virtual void setupPersistentFields() override;
+        
     private:
         enum HandlerType
         {
@@ -133,7 +150,7 @@ class CommsService
     public:
         CommsService();
         virtual ~CommsService() {}
-
+        
         void setupClientMessageBuffers(Client *client);
         bool getNewMessages(ClientConnection &);
         enum
@@ -151,7 +168,7 @@ class CommsService
             return commsServiceStatus;
         };
 
-        void checkForNewClientData();
+        bool checkForNewClientData();
         virtual bool checkForNewClients();
         virtual void stopDisconnectedClients();
         virtual void processClientData(const std::string &);

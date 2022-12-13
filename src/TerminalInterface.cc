@@ -10,22 +10,35 @@
 #include <stdio.h>
 
 #include <cinttypes>
-#include <mathFuncs.h>
+// #include <mathFuncs.h>
 #include <cstring>
+#include <map>
+#include <utility>
+#include "teensy41_device.h"
 
-// #include <patch.h>
-
-TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial)
+TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint32_t _baud = 230400)
     : serial(_serial), ifLabel(_label)
 {
+    serial->begin(_baud);
     clearConsole();
     debugRowOffset = 0;
     debugMessageCount = 0;
     promptRow = LFAST::NUM_HEADER_ROWS + 1;
     printHeader();
-    // resetPrompt();
+    highestFieldRowNum = 0;
 };
 
+void TerminalInterface::registerDevice(const std::string &devStr)
+{
+    std::pair<std::string, uint8_t> devMap;
+    devMap.first = devStr;
+    if (highestFieldRowNum == 0)
+        devMap.second = highestFieldRowNum + 1;
+    else
+        devMap.second = highestFieldRowNum -3;
+
+    senderRowOffsetMap.insert(devMap);
+}
 void TerminalInterface::printHeader()
 {
     cursorToRow(LFAST::TOP_HEADER);
@@ -33,7 +46,7 @@ void TerminalInterface::printHeader()
 
     std::string HEADER_BORDER_STRING = std::string(TERMINAL_WIDTH, '#');
     std::string HEADER_LABEL_STRING = ifLabel;
-    std::string HEADER_LABEL_ROW_SIDE = std::string((TERMINAL_WIDTH - HEADER_LABEL_STRING.size())/2-1, '#');
+    std::string HEADER_LABEL_ROW_SIDE = std::string((TERMINAL_WIDTH - HEADER_LABEL_STRING.size()) / 2 - 1, '#');
     std::string HEADER_LABEL_ROW = HEADER_LABEL_ROW_SIDE + " " + HEADER_LABEL_STRING + " " + HEADER_LABEL_ROW_SIDE;
 
     cursorToRow(LFAST::TOP_HEADER);
@@ -52,7 +65,6 @@ void TerminalInterface::resetPrompt()
     std::string DEBUG_BORDER_STR = std::string(TERMINAL_WIDTH, '-');
     serial->printf("%s", DEBUG_BORDER_STR.c_str());
 
-
     showCursor();
     std::memset(rxBuff, '\0', CLI_BUFF_LENGTH);
     rxPtr = rxBuff;
@@ -61,9 +73,6 @@ void TerminalInterface::resetPrompt()
     clearToEndOfRow();
     currentInputCol = 4;
     cursorToCol(currentInputCol);
-
-
-
     // BLINKING();
 }
 
@@ -102,7 +111,6 @@ void TerminalInterface::serviceCLI()
     // {
     // serial->printf("%d", cnt++);
     // }
-
 }
 
 void TerminalInterface::handleCliCommand()
@@ -114,16 +122,21 @@ void TerminalInterface::handleCliCommand()
     resetPrompt();
 }
 
-void TerminalInterface::addPersistentField(const std::string &label, uint8_t printRow)
+void TerminalInterface::addPersistentField(const std::string &device, const std::string &label, uint8_t printRow)
 {
-    static uint16_t highestFieldRowNum = 0;
-    uint16_t adjustedPrintRow = printRow + LFAST::NUM_HEADER_ROWS;
+    uint8_t deviceRowOffs = senderRowOffsetMap[device];
+    uint8_t devicePrintRow = printRow + deviceRowOffs;
+    // TEST_SERIAL.printf("\r\n%s: %s...\toffset:%d...\tprintRow:%d...\r\n", device.c_str(), label.c_str(), deviceRowOffs, devicePrintRow);
+
+    uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+
     if (adjustedPrintRow > highestFieldRowNum)
     {
         highestFieldRowNum = adjustedPrintRow;
         promptRow = highestFieldRowNum + 3;
         firstDebugRow = promptRow + 3;
     }
+
     if (fieldStartCol < (label.size() + 1))
     {
         fieldStartCol = label.size() + 1;
@@ -134,9 +147,14 @@ void TerminalInterface::addPersistentField(const std::string &label, uint8_t pri
     persistentFields.push_back(field);
     // resetPrompt();
 }
-
+void TerminalInterface::printDebugInfo()
+{
+    TEST_SERIAL.printf("highest field row:%d\r\n", highestFieldRowNum);
+}
 void TerminalInterface::printPersistentFieldLabels()
 {
+    // TEST_SERIAL.printf("Num fields:%d\r\n", persistentFields.size());
+
     for (auto field : persistentFields)
     {
         cursorToRow(field->printRow);
@@ -179,7 +197,7 @@ void TerminalInterface::addDebugMessage(const std::string &msg, uint8_t level)
 
     if (debugMessages.size() < LFAST::MAX_DEBUG_ROWS)
     {
-        cursorToRowCol((firstDebugRow+debugRowOffset++), 0);
+        cursorToRowCol((firstDebugRow + debugRowOffset++), 0);
         clearToEndOfRow();
         debugMessages.push_back(msgPrintSr);
         serial->println(msgPrintSr.c_str());
@@ -202,7 +220,7 @@ void TerminalInterface::updatePersistentField(uint8_t printRow, const std::strin
 {
     hideCursor();
     uint16_t adjustedPrintRow = printRow + LFAST::NUM_HEADER_ROWS;
-    cursorToRowCol(adjustedPrintRow, fieldStartCol+4);
+    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
     // clearToEndOfRow();
     // cursorTCol(fieldStartCol+4);
     serial->print(fieldValStr.c_str());
