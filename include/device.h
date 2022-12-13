@@ -21,13 +21,21 @@
 #define SERIAL_CH(N) CONCAT(Serial, N)
 
 
-// #define MODE_PIN_LOW 0U
-// #define MODE_PIN_HIGH 1U
-// #define MODE_PIN_INVALID 2U
-
+#if defined(ENABLE_TERMINAL) && !defined(TEST_SERIAL_NO)
+#warning "Terminal enabled but test serial not defined."
+#warning "Define TEST_SERIAL_NO and TEST_SERIAL_BAUD in build flags.
+#warning "Defaulting to Hardware serial #2 at 230400 bps."
 #define TEST_SERIAL_NO 2
-#define TEST_SERIAL SERIAL_CH(TEST_SERIAL_NO)
+#endif
+
+#if defined(ENABLE_TERMINAL) && !defined(TEST_SERIAL_BAUD)
+#warning "Terminal enabled but test serial not defined."
+#warning "Define TEST_SERIAL_NO and TEST_SERIAL_BAUD in build flags.
+#warning "Defaulting to Hardware serial #2 at 230400 bps."
 #define TEST_SERIAL_BAUD 230400
+#endif
+
+#define TEST_SERIAL SERIAL_CH(TEST_SERIAL_NO)
 
 #if TEST_SERIAL_NO==1
     #define TEST_SERIAL_RX_PIN 0
