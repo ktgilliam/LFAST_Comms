@@ -20,6 +20,11 @@
 
 #define SERIAL_CH(N) CONCAT(Serial, N)
 
+#if defined(TEST_SERIAL_NO)
+#define ENABLE_TERMINAL 1
+#else
+#define ENABLE_TERMINAL 0
+#endif
 
 #if defined(ENABLE_TERMINAL) && !defined(TEST_SERIAL_NO)
 #warning "Terminal enabled but test serial not defined."

@@ -23,7 +23,7 @@ TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *
     debugMessageCount = 0;
     promptRow = LFAST::NUM_HEADER_ROWS + 1;
     printHeader();
-    serial->begin(_baud)
+    serial->begin(_baud);
     // resetPrompt();
 };
 
