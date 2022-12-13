@@ -14,6 +14,8 @@
 #include <cstring>
 #include <map>
 #include <utility>
+#include <cstdio>
+
 #include "teensy41_device.h"
 
 TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint32_t _baud = 230400)
@@ -174,7 +176,7 @@ template<typename... Args>
 void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
 {
     char msgBuff[100]{0};
-    std::sprintf(msgBuff, args...);
+    printf(msgBuff, args...);
     printDebugMessage(msgBuff);
 }
 
