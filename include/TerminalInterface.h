@@ -82,7 +82,7 @@ public:
     void serviceCLI();
     // void printDebugMessage(std::string&, uint8_t);
     template<typename... Args>
-    void TerminalInterface::printfDebugMessage(const char* fmt, Args... args);
+    void printfDebugMessage(const char* fmt, Args... args);
     void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
 
 
