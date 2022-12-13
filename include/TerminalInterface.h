@@ -80,9 +80,12 @@ public:
     void registerDevice(const std::string &);
     // void updateStatusFields(MountControl &);
     void serviceCLI();
-    // void addDebugMessage(std::string&, uint8_t);
-    void addDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
-    // void clearDebugMessages();
+    // void printDebugMessage(std::string&, uint8_t);
+    template<typename... Args>
+    void TerminalInterface::printfDebugMessage(const char* fmt, Args... args);
+    void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
+
+
     void printHeader();
     void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);
 

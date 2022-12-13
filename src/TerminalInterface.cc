@@ -169,7 +169,16 @@ void TerminalInterface::printPersistentFieldLabels()
     resetPrompt();
 }
 
-void TerminalInterface::addDebugMessage(const std::string &msg, uint8_t level)
+
+template<typename... Args>
+void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
+{
+    char msgBuff[100]{0};
+    std::sprintf(msgBuff, args...);
+    printDebugMessage(msgBuff);
+}
+
+void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
     debugMessageCount++;
     std::string colorStr;

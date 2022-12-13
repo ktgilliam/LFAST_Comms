@@ -42,7 +42,7 @@ void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
         char msgBuff[JSON_PROGMEM_SIZE]{0};
         msg.getMessageStr(msgBuff);
         sprintf(debugMsgBuff, "Invalid Message: %s", msgBuff);
-        cli->addDebugMessage(msgBuff);
+        cli->printDebugMessage(msgBuff);
     }
 }
 
@@ -120,11 +120,11 @@ void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
         char msgBuff[100]{0};
 
         sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-        debugCli->addDebugMessage(msgBuff);
+        debugCli->printDebugMessage(msgBuff);
         std::memset(msgBuff, 0, sizeof(msgBuff));
 
         sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
-        debugCli->addDebugMessage(msgBuff);
+        debugCli->printDebugMessage(msgBuff);
         std::memset(msgBuff, 0, sizeof(msgBuff));
 
         // bool nullTermFound = false;
@@ -168,7 +168,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
     {
         if (cli != nullptr)
         {
-            cli->addDebugMessage("Something went wrong processing messages.");
+            cli->printDebugMessage("Something went wrong processing messages.");
         }
         return;
     }
@@ -265,7 +265,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     {
         if (cli != nullptr)
         {
-            cli->addDebugMessage("Not yet implemented (something went wrong).");
+            cli->printDebugMessage("Not yet implemented (something went wrong).");
         }
     }
 }
@@ -279,7 +279,7 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(Terminal
         {
             char msgBuff[100]{0};
             sprintf(msgBuff, "deserializeJson() failed: %s", error.c_str());
-            debugCli->addDebugMessage(msgBuff);
+            debugCli->printDebugMessage(msgBuff);
         }
     }
     return this->JsonDoc;
