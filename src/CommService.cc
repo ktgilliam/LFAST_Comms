@@ -36,10 +36,12 @@ void LFAST::CommsService::defaultMessageHandler(std::string info)
 void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
 {
     std::stringstream ss;
-    ss << "Invalid Message.";
-    //
-    ss << std::endl;
-    Serial2.println(ss.str().c_str());
+    if (cli != nullptr)
+    {
+        char msgBuff[100]{0};
+        sprintf(msgBuff, "Invalid Message: %s", msg.getMessageStr());
+        cli->addDebugMessage(msgBuff);
+    }
 }
 
 bool LFAST::CommsService::checkForNewClients()
@@ -111,25 +113,35 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 
 void LFAST::CommsMessage::printMessageInfo()
 {
-    Serial2.printf("MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-    Serial2.print("MESSAGE Input Buffer: \033[0K");
-
-    bool nullTermFound = false;
-    unsigned int ii = 0;
-    while (!nullTermFound && ii < JSON_PROGMEM_SIZE)
+    if (cli != nullptr)
     {
-        char c2 = this->jsonInputBuffer[ii++];
-        if (c2 != '\0')
-        {
-            Serial2.printf("%c", c2);
-        }
-        else
-        {
-            nullTermFound = true;
-            Serial2.printf("%s[%u]\r\n", "\\0", ii);
-        }
+        char msgBuff[100]{0};
+
+        sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
+        cli->addDebugMessage(msgBuff);
+        std::memset(msgBuff, 0, sizeof(msgBuff));
+
+        sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
+        cli->addDebugMessage(msgBuff);
+        std::memset(msgBuff, 0, sizeof(msgBuff));
+
+        // bool nullTermFound = false;
+        // unsigned int ii = 0;
+        // while (!nullTermFound && ii < JSON_PROGMEM_SIZE)
+        // {
+        //     char c2 = this->jsonInputBuffer[ii++];
+        //     if (c2 != '\0')
+        //     {
+        //         Serial2.printf("%c", c2);
+        //     }
+        //     else
+        //     {
+        //         nullTermFound = true;
+        //         Serial2.printf("%s[%u]\r\n", "\\0", ii);
+        //     }
+        // }
+        // Serial2.println("");
     }
-    Serial2.println("");
 }
 
 void LFAST::CommsService::processClientData(const std::string &destFilter = "")
@@ -152,7 +164,10 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
 {
     if (msg->hasBeenProcessed())
     {
-        Serial2.println("Something went wrong processing messages.");
+        if (cli != nullptr)
+        {
+            cli->addDebugMessage("Something went wrong processing messages.");
+        }
         return;
     }
 
@@ -231,13 +246,16 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
         activeConnection->client->write('\0');
         if (cli != nullptr)
         {
+            cli->addDebugMessage("trying to print sent message...")
             cli->updatePersistentField(MESSAGE_SENT_ROW, msg.getBuffPtr());
         }
     }
     else
     {
-        // TODO
-        Serial2.println("Not yet implemented (something went wrong).");
+        if (cli != nullptr)
+        {
+            cli->addDebugMessage("Not yet implemented (something went wrong).");
+        }
     }
 }
 
@@ -246,8 +264,12 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize()
     DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
     if (error)
     {
-        Serial2.print(F("deserializeJson() failed: "));
-        Serial2.println(error.f_str());
+        if (cli != nullptr)
+        {
+            char msgBuff[100]{0};
+            sprintf(msgBuff, "deserializeJson() failed: %s", error.f_str());
+            cli->addDebugMessage(msgBuff);
+        }
     }
     return this->JsonDoc;
 }
