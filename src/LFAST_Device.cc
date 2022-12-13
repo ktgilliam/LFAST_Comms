@@ -6,5 +6,5 @@ void LFAST_Device::connectTerminalInterface(TerminalInterface *_cli)
 {
     cli = _cli;
     setupPersistentFields();
-    cli->printPersistentFieldLabels()
+    cli->printPersistentFieldLabels();
 }

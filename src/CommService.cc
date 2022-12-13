@@ -96,9 +96,10 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                 if (objectDone)
                 {
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
-                    #if TERMINAL_ENABLED
-                    cli->updatePersistentField(MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
-                    #endif
+                    if (cli != nullptr)
+                    {
+                        cli->updatePersistentField(MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
+                    }
                     connection.rxMessageQueue.push_back(newMsg);
                     break;
                 }
@@ -228,9 +229,10 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
         serializeJson(msg.getJsonDoc(), bufferedClient);
         bufferedClient.flush();
         activeConnection->client->write('\0');
-        #if TERMINAL_ENABLED
-        cli->updatePersistentField(MESSAGE_SENT_ROW, msg.getBuffPtr());
-        #endif
+        if (cli != nullptr)
+        {
+            cli->updatePersistentField(MESSAGE_SENT_ROW, msg.getBuffPtr());
+        }
     }
     else
     {
@@ -268,7 +270,7 @@ void LFAST::CommsService::stopDisconnectedClients()
 
 void LFAST::CommsService::setupPersistentFields()
 {
-    cli->addPersistentField("Comms Status", COMMS_SERVICE_STATUS_ROW);
+    cli->addPersistentField("COMMS STATUS", COMMS_SERVICE_STATUS_ROW);
 
     cli->addPersistentField("RECEIVED MESSAGE", MESSAGE_RECEIVED_ROW);
 
