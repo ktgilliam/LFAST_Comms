@@ -113,6 +113,8 @@ class CommsService : public LFAST_Device
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
         bool commsServiceStatus;
+        virtual void setupPersistentFields(){}
+        
     private:
         enum HandlerType
         {
