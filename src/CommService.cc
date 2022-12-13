@@ -113,35 +113,35 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 
 void LFAST::CommsMessage::printMessageInfo()
 {
-    if (cli != nullptr)
-    {
-        char msgBuff[100]{0};
+    // if (cli != nullptr)
+    // {
+    //     char msgBuff[100]{0};
 
-        sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-        cli->addDebugMessage(msgBuff);
-        std::memset(msgBuff, 0, sizeof(msgBuff));
+    //     sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
+    //     cli->addDebugMessage(msgBuff);
+    //     std::memset(msgBuff, 0, sizeof(msgBuff));
 
-        sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
-        cli->addDebugMessage(msgBuff);
-        std::memset(msgBuff, 0, sizeof(msgBuff));
+    //     sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
+    //     cli->addDebugMessage(msgBuff);
+    //     std::memset(msgBuff, 0, sizeof(msgBuff));
 
-        // bool nullTermFound = false;
-        // unsigned int ii = 0;
-        // while (!nullTermFound && ii < JSON_PROGMEM_SIZE)
-        // {
-        //     char c2 = this->jsonInputBuffer[ii++];
-        //     if (c2 != '\0')
-        //     {
-        //         Serial2.printf("%c", c2);
-        //     }
-        //     else
-        //     {
-        //         nullTermFound = true;
-        //         Serial2.printf("%s[%u]\r\n", "\\0", ii);
-        //     }
-        // }
-        // Serial2.println("");
-    }
+    //     // bool nullTermFound = false;
+    //     // unsigned int ii = 0;
+    //     // while (!nullTermFound && ii < JSON_PROGMEM_SIZE)
+    //     // {
+    //     //     char c2 = this->jsonInputBuffer[ii++];
+    //     //     if (c2 != '\0')
+    //     //     {
+    //     //         Serial2.printf("%c", c2);
+    //     //     }
+    //     //     else
+    //     //     {
+    //     //         nullTermFound = true;
+    //     //         Serial2.printf("%s[%u]\r\n", "\\0", ii);
+    //     //     }
+    //     // }
+    //     // Serial2.println("");
+    // }
 }
 
 void LFAST::CommsService::processClientData(const std::string &destFilter = "")
@@ -246,7 +246,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
         activeConnection->client->write('\0');
         if (cli != nullptr)
         {
-            cli->addDebugMessage("trying to print sent message...")
+            cli->addDebugMessage("trying to print sent message...");
             cli->updatePersistentField(MESSAGE_SENT_ROW, msg.getBuffPtr());
         }
     }
