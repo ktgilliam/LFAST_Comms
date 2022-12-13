@@ -15,7 +15,7 @@
 
 // #include <patch.h>
 
-TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint16_t _baud=230400)
+TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint32_t _baud=230400)
     : serial(_serial), ifLabel(_label)
 {
     serial->begin(_baud);
