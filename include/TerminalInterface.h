@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstdio>
 
 #define CLI_BUFF_LENGTH 90
 
@@ -115,5 +116,13 @@ public:
     // clang-format on
     void printDebugInfo();
 };
+
+template<typename... Args>
+void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
+{
+    char msgBuff[100]{0};
+    sprintf(msgBuff, fmt, args...);
+    printDebugMessage(msgBuff);
+}
 
 int fs_sexa(char *out, double a, int w, int fracbase);
