@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <StreamUtils.h>
 #include <algorithm>
-// #include <string_view>
+#include "teensy41_device.h"
 
 std::vector<LFAST::ClientConnection> LFAST::CommsService::connections{};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,11 +38,9 @@ void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
     std::stringstream ss;
     if (cli != nullptr)
     {
-        char debugMsgBuff[100+JSON_PROGMEM_SIZE]{0};
         char msgBuff[JSON_PROGMEM_SIZE]{0};
         msg.getMessageStr(msgBuff);
-        sprintf(debugMsgBuff, "Invalid Message: %s", msgBuff);
-        cli->printDebugMessage(msgBuff);
+        cli->printfDebugMessage("Invalid Message: %s", msgBuff);
     }
 }
 
@@ -117,15 +115,8 @@ void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
 {
     if (debugCli != nullptr)
     {
-        char msgBuff[100]{0};
-
-        sprintf(msgBuff, "MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
-        debugCli->printDebugMessage(msgBuff);
-        std::memset(msgBuff, 0, sizeof(msgBuff));
-
-        sprintf(msgBuff, "MESSAGE Input Buffer: \033[0K");
-        debugCli->printDebugMessage(msgBuff);
-        std::memset(msgBuff, 0, sizeof(msgBuff));
+        debugCli->printfDebugMessage("MESSAGE ID: %u\033[0K\r\n", (unsigned int)this->getBuffPtr());
+        debugCli->printDebugMessage("MESSAGE Input Buffer: \033[0K");
 
         // bool nullTermFound = false;
         // unsigned int ii = 0;
@@ -164,6 +155,7 @@ void LFAST::CommsService::processClientData(const std::string &destFilter = "")
 
 void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &destFilter)
 {
+
     if (msg->hasBeenProcessed())
     {
         if (cli != nullptr)
@@ -173,25 +165,25 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
         return;
     }
 
-    StaticJsonDocument<JSON_PROGMEM_SIZE> &doc = msg->deserialize();
-    JsonObject msgRoot = doc.as<JsonObject>();
-    if (!destFilter.empty())
-        msgRoot = msgRoot[destFilter];
-    // Test if parsing succeeds.
     if (cli != nullptr)
     {
-        StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = msgRoot;
-        char printBuff[JSON_PROGMEM_SIZE]{0};
-        serializeJson(docCopy, printBuff, JSON_PROGMEM_SIZE);
-        cli->updatePersistentField(DeviceName, PROCESSED_MESSAGE_ROW, printBuff);
+        cli->updatePersistentField(DeviceName, PROCESSED_MESSAGE_ROW, msg->jsonInputBuffer);
     }
+
+    StaticJsonDocument<JSON_PROGMEM_SIZE> &doc = msg->deserialize();
+    JsonObject msgRoot = doc.as<JsonObject>();
+
+    // Test if parsing succeeds.
+    if (!destFilter.empty())
+        msgRoot = msgRoot[destFilter];
     for (JsonPair kvp : msgRoot)
     {
         this->callMessageHandler(kvp);
     }
+
+    // memset(msg->jsonInputBuffer, 0, JSON_PROGMEM_SIZE);
     msg->setProcessedFlag();
 }
-
 
 bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 {
@@ -277,9 +269,7 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(Terminal
     {
         if (debugCli != nullptr)
         {
-            char msgBuff[100]{0};
-            sprintf(msgBuff, "deserializeJson() failed: %s", error.c_str());
-            debugCli->printDebugMessage(msgBuff);
+            debugCli->printfDebugMessage("deserializeJson() failed: %s", error.c_str());
         }
     }
     return this->JsonDoc;
@@ -287,6 +277,7 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(Terminal
 
 void LFAST::CommsMessage::getMessageStr(char *buff)
 {
+    TEST_SERIAL.println("getMessageStr");
     StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = this->JsonDoc;
     serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
 }
@@ -312,13 +303,13 @@ void LFAST::CommsService::setupPersistentFields()
 {
     if (cli == nullptr)
         return;
-    cli->addPersistentField(this->DeviceName,"[STATUS]", COMMS_SERVICE_STATUS_ROW);
+    cli->addPersistentField(this->DeviceName, "[STATUS]", COMMS_SERVICE_STATUS_ROW);
 
-    cli->addPersistentField(this->DeviceName,"[RAW RX]", RAW_MESSAGE_RECEIVED_ROW);
+    cli->addPersistentField(this->DeviceName, "[RAW RX]", RAW_MESSAGE_RECEIVED_ROW);
 
-    cli->addPersistentField(this->DeviceName,"[PROCESSED RX]", PROCESSED_MESSAGE_ROW);
+    cli->addPersistentField(this->DeviceName, "[PROCESSED RX]", PROCESSED_MESSAGE_ROW);
 
-    cli->addPersistentField(this->DeviceName,"[TX]", MESSAGE_SENT_ROW);
+    cli->addPersistentField(this->DeviceName, "[TX]", MESSAGE_SENT_ROW);
 }
 
 // void LFAST::CommsService::updateStatusFields()

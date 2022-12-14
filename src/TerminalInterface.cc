@@ -36,7 +36,7 @@ void TerminalInterface::registerDevice(const std::string &devStr)
     if (highestFieldRowNum == 0)
         devMap.second = highestFieldRowNum + 1;
     else
-        devMap.second = highestFieldRowNum -3;
+        devMap.second = highestFieldRowNum - 3;
 
     senderRowOffsetMap.insert(devMap);
 }
@@ -171,6 +171,48 @@ void TerminalInterface::printPersistentFieldLabels()
     resetPrompt();
 }
 
+void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, int fieldVal)
+{
+    uint8_t deviceRowOffs = senderRowOffsetMap[device];
+    uint8_t devicePrintRow = printRow + deviceRowOffs;
+    hideCursor();
+    uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
+    serial->print(fieldVal);
+    clearToEndOfRow();
+}
+
+void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char* fmt)
+{
+    uint8_t deviceRowOffs = senderRowOffsetMap[device];
+    uint8_t devicePrintRow = printRow + deviceRowOffs;
+    hideCursor();
+    uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
+    serial->printf(fmt, fieldVal);
+    clearToEndOfRow();
+}
+
+void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, const std::string &fieldValStr)
+{
+    uint8_t deviceRowOffs = senderRowOffsetMap[device];
+    uint8_t devicePrintRow = printRow + deviceRowOffs;
+    hideCursor();
+    uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
+    clearToEndOfRow();
+    printDebugMessage('   ');
+    printDebugMessage(fieldValStr);
+    uint16_t maxStrLen = (TERMINAL_WIDTH - fieldStartCol);
+    if (fieldValStr.length() > maxStrLen)
+        serial->print(fieldValStr.substr(0, maxStrLen).c_str());
+    else
+        serial->print(fieldValStr.c_str());
+    
+    clearToEndOfRow();
+    // showCursor();
+}
+
 void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
     auto currentTime = millis();
@@ -219,7 +261,6 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
         }
     }
 }
-
 
 int fs_sexa(char *out, double a, int w, int fracbase)
 {
