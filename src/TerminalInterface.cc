@@ -14,7 +14,6 @@
 #include <cstring>
 #include <map>
 #include <utility>
-#include <cstdio>
 
 #include "teensy41_device.h"
 
