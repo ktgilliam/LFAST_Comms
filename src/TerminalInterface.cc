@@ -148,10 +148,11 @@ void TerminalInterface::addPersistentField(const std::string &device, const std:
     persistentFields.push_back(field);
     // resetPrompt();
 }
-void TerminalInterface::printDebugInfo()
-{
-    TEST_SERIAL.printf("highest field row:%d\r\n", highestFieldRowNum);
-}
+// void TerminalInterface::printDebugInfo()
+// {
+//     TEST_SERIAL.printf("highest field row:%d\r\n", highestFieldRowNum);
+// }
+
 void TerminalInterface::printPersistentFieldLabels()
 {
     // TEST_SERIAL.printf("Num fields:%d\r\n", persistentFields.size());
@@ -172,6 +173,8 @@ void TerminalInterface::printPersistentFieldLabels()
 
 void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
+    auto currentTime = millis();
+
     debugMessageCount++;
     std::string colorStr;
     switch (level)
@@ -191,7 +194,7 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
     }
     std::stringstream ss;
     ss << std::setiosflags(std::ios::left) << std::setw(6);
-    ss << WHITE << debugMessageCount << ": " << colorStr << msg;
+    ss << WHITE << debugMessageCount << "[" << currentTime "]: " << colorStr << msg;
     std::string msgPrintSr = ss.str();
 
     // serial->printf("[%d]", debugMessageCount);
@@ -217,17 +220,6 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
     }
 }
 
-void TerminalInterface::updatePersistentField(uint8_t printRow, const std::string &fieldValStr)
-{
-    hideCursor();
-    uint16_t adjustedPrintRow = printRow + LFAST::NUM_HEADER_ROWS;
-    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
-    // clearToEndOfRow();
-    // cursorTCol(fieldStartCol+4);
-    serial->print(fieldValStr.c_str());
-    clearToEndOfRow();
-    // showCursor();
-}
 
 int fs_sexa(char *out, double a, int w, int fracbase)
 {

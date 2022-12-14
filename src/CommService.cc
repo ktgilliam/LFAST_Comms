@@ -102,7 +102,7 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
                     if (cli != nullptr)
                     {
-                        cli->updatePersistentField(RAW_MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
+                        cli->updatePersistentField(DeviceName, RAW_MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
                     }
                     connection.rxMessageQueue.push_back(newMsg);
                     break;
@@ -183,7 +183,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
         StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = msgRoot;
         char printBuff[JSON_PROGMEM_SIZE]{0};
         serializeJson(docCopy, printBuff, JSON_PROGMEM_SIZE);
-        cli->updatePersistentField(PROCESSED_MESSAGE_ROW, printBuff);
+        cli->updatePersistentField(DeviceName, PROCESSED_MESSAGE_ROW, printBuff);
     }
     for (JsonPair kvp : msgRoot)
     {
@@ -254,7 +254,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
         {
             char msgBuff[JSON_PROGMEM_SIZE]{0};
             msg.getMessageStr(msgBuff);
-            cli->updatePersistentField(MESSAGE_SENT_ROW, msgBuff);
+            cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
         }
         WriteBufferingStream bufferedClient(*(activeConnection->client), std::strlen(msg.getBuffPtr()));
         serializeJson(msg.getJsonDoc(), bufferedClient);

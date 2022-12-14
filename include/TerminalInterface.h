@@ -90,7 +90,9 @@ public:
     void printHeader();
     void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);
 
-    void updatePersistentField(uint8_t printRow, const std::string &fieldValStr);
+    template<typename T>
+    void updatePersistentField(const std::string &device, uint8_t printRow, T fieldValStr);
+    // void updatePersistentField(uint8_t printRow, const std::string &fieldValStr);
     void printPersistentFieldLabels();
 
     // clang-format off
@@ -114,7 +116,7 @@ public:
     inline void hideCursor() { serial->printf("\033[?25l"); }
     inline void showCursor() { serial->printf("\033[?25h"); }
     // clang-format on
-    void printDebugInfo();
+    // void printDebugInfo();
 };
 
 template<typename... Args>
@@ -126,3 +128,29 @@ void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
 }
 
 int fs_sexa(char *out, double a, int w, int fracbase);
+
+
+template <typename T>
+void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, T fieldVal)
+{
+    uint8_t deviceRowOffs = senderRowOffsetMap[device];
+    uint8_t devicePrintRow = printRow + deviceRowOffs;
+    hideCursor();
+    uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
+    serial->print(String(fieldVal));
+    clearToEndOfRow();
+}
+
+// template <>
+// void TerminalInterface::updatePersistentField(uint8_t printRow, const std::string &fieldValStr)
+// {
+//     hideCursor();
+//     uint16_t adjustedPrintRow = printRow + LFAST::NUM_HEADER_ROWS;
+//     cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
+//     // clearToEndOfRow();
+//     // cursorTCol(fieldStartCol+4);
+//     serial->print(fieldValStr.c_str());
+//     clearToEndOfRow();
+//     // showCursor();
+// }
