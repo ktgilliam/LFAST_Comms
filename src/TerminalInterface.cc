@@ -170,15 +170,6 @@ void TerminalInterface::printPersistentFieldLabels()
     resetPrompt();
 }
 
-
-template<typename... Args>
-void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
-{
-    char msgBuff[100]{0};
-    printf(msgBuff, args...);
-    printDebugMessage(msgBuff);
-}
-
 void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
     debugMessageCount++;
