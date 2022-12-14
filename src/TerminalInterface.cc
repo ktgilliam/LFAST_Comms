@@ -14,6 +14,7 @@
 #include <cstring>
 #include <map>
 #include <utility>
+
 #include "teensy41_device.h"
 
 TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint32_t _baud = 230400)
@@ -169,7 +170,7 @@ void TerminalInterface::printPersistentFieldLabels()
     resetPrompt();
 }
 
-void TerminalInterface::addDebugMessage(const std::string &msg, uint8_t level)
+void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
     debugMessageCount++;
     std::string colorStr;

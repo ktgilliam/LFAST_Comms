@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstdio>
 
 #define CLI_BUFF_LENGTH 90
 
@@ -80,9 +81,12 @@ public:
     void registerDevice(const std::string &);
     // void updateStatusFields(MountControl &);
     void serviceCLI();
-    // void addDebugMessage(std::string&, uint8_t);
-    void addDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
-    // void clearDebugMessages();
+    // void printDebugMessage(std::string&, uint8_t);
+    template<typename... Args>
+    void printfDebugMessage(const char* fmt, Args... args);
+    void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
+
+
     void printHeader();
     void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);
 
@@ -112,5 +116,13 @@ public:
     // clang-format on
     void printDebugInfo();
 };
+
+template<typename... Args>
+void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
+{
+    char msgBuff[100]{0};
+    sprintf(msgBuff, fmt, args...);
+    printDebugMessage(msgBuff);
+}
 
 int fs_sexa(char *out, double a, int w, int fracbase);
