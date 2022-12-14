@@ -194,7 +194,7 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
     }
     std::stringstream ss;
     ss << std::setiosflags(std::ios::left) << std::setw(6);
-    ss << WHITE << debugMessageCount << "[" << currentTime "]: " << colorStr << msg;
+    ss << WHITE << debugMessageCount << "[" << currentTime << "]: " << colorStr << msg;
     std::string msgPrintSr = ss.str();
 
     // serial->printf("[%d]", debugMessageCount);
