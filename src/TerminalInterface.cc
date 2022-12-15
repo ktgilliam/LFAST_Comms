@@ -182,6 +182,16 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     clearToEndOfRow();
 }
 
+void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, long fieldVal)
+{
+    uint8_t deviceRowOffs = senderRowOffsetMap[device];
+    uint8_t devicePrintRow = printRow + deviceRowOffs;
+    hideCursor();
+    uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
+    serial->print(fieldVal);
+    clearToEndOfRow();
+}
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char* fmt)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];

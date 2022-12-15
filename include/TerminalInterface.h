@@ -67,7 +67,7 @@ private:
     uint16_t debugMessageCount;
     uint16_t firstDebugRow = LFAST::NUM_HEADER_ROWS + 1;
     uint16_t debugRowOffset = 0;
-    
+
     uint16_t promptRow;
     uint16_t messageRow;
     std::string ifLabel;
@@ -75,6 +75,7 @@ private:
     std::vector<PersistentTerminalField *> persistentFields;
     std::map<std::string, uint8_t> senderRowOffsetMap;
     uint16_t highestFieldRowNum;
+
 public:
     TerminalInterface(const std::string &, HardwareSerial *, uint32_t);
 
@@ -82,17 +83,16 @@ public:
     // void updateStatusFields(MountControl &);
     void serviceCLI();
     // void printDebugMessage(std::string&, uint8_t);
-    template<typename... Args>
-    void printfDebugMessage(const char* fmt, Args... args);
+    template <typename... Args>
+    void printfDebugMessage(const char *fmt, Args... args);
     void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
-
 
     void printHeader();
     void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);
-
     void updatePersistentField(const std::string &device, uint8_t printRow, int fieldVal);
+    void updatePersistentField(const std::string &device, uint8_t printRow, long fieldVal);
     void updatePersistentField(const std::string &device, uint8_t printRow, const std::string &fieldValStr);
-    void updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char* fmt="%6.4f");
+    void updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char *fmt = "%6.4f");
 
     void printPersistentFieldLabels();
 
@@ -120,8 +120,8 @@ public:
     // void printDebugInfo();
 };
 
-template<typename... Args>
-void TerminalInterface::printfDebugMessage(const char* fmt, Args... args )
+template <typename... Args>
+void TerminalInterface::printfDebugMessage(const char *fmt, Args... args)
 {
     char msgBuff[100]{0};
     sprintf(msgBuff, fmt, args...);
