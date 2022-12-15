@@ -27,9 +27,9 @@ void LFAST::CommsService::setupClientMessageBuffers(Client *client)
     this->connections.push_back(newConnection);
 }
 
-void LFAST::CommsService::defaultMessageHandler(const char * info)
+void LFAST::CommsService::defaultMessageHandler(const char *info)
 {
-    if(cli != nullptr)
+    if (cli != nullptr)
     {
         cli->printfDebugMessage("Unregistered Message: [%s].\r\n", info);
     }
@@ -143,7 +143,7 @@ void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
     }
 }
 
-void LFAST::CommsService::processClientData(const char * destFilter = "")
+void LFAST::CommsService::processClientData(const char *destFilter = "")
 {
     // if (cli != nullptr)
     //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "processClientData()");
@@ -158,7 +158,7 @@ void LFAST::CommsService::processClientData(const char * destFilter = "")
             itr = conn.rxMessageQueue.erase(itr);
         }
     }
-    this->activeConnection = nullptr;
+    // this->activeConnection = nullptr;
 }
 
 void LFAST::CommsService::processMessage(CommsMessage *msg, const char *destFilter)
@@ -179,7 +179,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const char *destFilt
         cli->updatePersistentField(DeviceName, PROCESSED_MESSAGE_ROW, msg->jsonInputBuffer);
     }
 
-    StaticJsonDocument<JSON_PROGMEM_SIZE> &doc = msg->deserialize();
+    DynamicJsonDocument &doc = msg->deserialize();
     JsonObject msgRoot = doc.as<JsonObject>();
 
     // Test if parsing succeeds.
@@ -237,8 +237,8 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
         break;
         case STRING_HANDLER:
         {
-            auto val = kvp.value().as<std::string>();
-            this->callMessageHandler<std::string>(keyStr, val);
+            auto val = kvp.value().as<const char *>();
+            this->callMessageHandler<const char *>(keyStr, val);
         }
         break;
         default:
@@ -254,24 +254,40 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     static int callCount = 0;
 
     if (cli != nullptr)
-        // cli->printfDebugMessage("sendMessage: %d", callCount++);
         cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, callCount++);
 
     if (sendOpt == ACTIVE_CONNECTION)
     {
+        if (activeConnection == nullptr)
+        {
+            if (cli != nullptr)
+            {
+                cli->printDebugMessage("Error: Active connection is null", LFAST::ERROR);
+            }
+            return;
+        }
         // if (cli != nullptr)
         // {
         //     char msgBuff[JSON_PROGMEM_SIZE]{0};
         //     msg.getMessageStr(msgBuff);
         //     cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
         // }
-        auto sz = measureJson(msg.getJsonDoc());
-        auto chunkSize = sz < 64 ? sz : 64;
-        cli->printfDebugMessage("msgLen: %d", chunkSize);
-        WriteBufferingStream bufferedClient{*(activeConnection->client), chunkSize};
-        serializeJson(msg.getJsonDoc(), bufferedClient);
-        bufferedClient.flush();
-        activeConnection->client->write('\0');
+        if (activeConnection->client)
+        {
+#define USE_BUFFERED_CLIENT 1
+#if USE_BUFFERED_CLIENT == 1
+            auto sz = measureJson(msg.getJsonDoc());
+            auto chunkSize = sz < 64 ? sz : 64;
+            WriteBufferingStream bufferedClient{*(activeConnection->client), chunkSize};
+            serializeJson(msg.getJsonDoc(), bufferedClient);
+            bufferedClient.flush();
+            activeConnection->client->write('\0');
+#else
+            serializeJson(msg.getJsonDoc(), *(activeConnection->client));
+            activeConnection->client->write('\0');
+            // cli->printDebugMessage("Done sending (unbuff'd)");
+#endif
+        }
     }
     else
     {
@@ -282,15 +298,23 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     }
 }
 
-StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(TerminalInterface *debugCli)
+DynamicJsonDocument &LFAST::CommsMessage::deserialize(TerminalInterface *debugCli)
 {
-    DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
-    if (error)
+    if (this->jsonInputBuffer != nullptr)
     {
-        if (debugCli != nullptr)
+        DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
+        if (error)
         {
-            debugCli->printfDebugMessage("deserializeJson() failed: %s", error.c_str());
+            if (debugCli != nullptr)
+            {
+                debugCli->printfDebugMessage("deserializeJson() failed: %s", error.c_str());
+            }
         }
+    }
+    else
+    {
+        debugCli->printfDebugMessage("jsonInputBuffer nullptr error");
+        while (1) {;}
     }
     return this->JsonDoc;
 }
@@ -298,8 +322,8 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(Terminal
 void LFAST::CommsMessage::getMessageStr(char *buff)
 {
     // TEST_SERIAL.println("getMessageStr");
-    StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = this->JsonDoc;
-    serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
+    // DynamicJsonDocument<JSON_PROGMEM_SIZE> docCopy = this->JsonDoc;
+    // serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
 }
 
 void LFAST::CommsService::stopDisconnectedClients()
