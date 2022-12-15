@@ -3,10 +3,9 @@
 
 #include <Arduino.h>
 #include <array>
-#include <sstream>
 #include <iterator>
 #include <cstring>
-#include <string>
+// #include <string>
 #include <cstdlib>
 #include <StreamUtils.h>
 #include <algorithm>
@@ -28,14 +27,16 @@ void LFAST::CommsService::setupClientMessageBuffers(Client *client)
     this->connections.push_back(newConnection);
 }
 
-void LFAST::CommsService::defaultMessageHandler(std::string info)
+void LFAST::CommsService::defaultMessageHandler(const char * info)
 {
-    Serial2.printf("Unregistered Message: [%s].\r\n", info.c_str());
+    if(cli != nullptr)
+    {
+        cli->printfDebugMessage("Unregistered Message: [%s].\r\n", info);
+    }
 }
 
 void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
 {
-    std::stringstream ss;
     if (cli != nullptr)
     {
         char msgBuff[JSON_PROGMEM_SIZE]{0};
@@ -53,6 +54,8 @@ bool LFAST::CommsService::checkForNewClients()
 
 bool LFAST::CommsService::checkForNewClientData()
 {
+    // if (cli != nullptr)
+    //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "checkForNewClientData()");
     bool newMsgFlag = false;
     // check for incoming data from all clients
     for (auto &connection : this->connections)
@@ -67,6 +70,9 @@ bool LFAST::CommsService::checkForNewClientData()
 
 bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
 {
+
+    // if (cli != nullptr)
+    //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "getNewMessages()");
     // listen for incoming clients
     Client *client = connection.client;
     if (client)
@@ -137,8 +143,10 @@ void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
     }
 }
 
-void LFAST::CommsService::processClientData(const std::string &destFilter = "")
+void LFAST::CommsService::processClientData(const char * destFilter = "")
 {
+    // if (cli != nullptr)
+    //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "processClientData()");
     for (auto &conn : this->connections)
     {
         this->activeConnection = &conn;
@@ -153,9 +161,10 @@ void LFAST::CommsService::processClientData(const std::string &destFilter = "")
     this->activeConnection = nullptr;
 }
 
-void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &destFilter)
+void LFAST::CommsService::processMessage(CommsMessage *msg, const char *destFilter)
 {
-
+    // if (cli != nullptr)
+    //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "processMessage()");
     if (msg->hasBeenProcessed())
     {
         if (cli != nullptr)
@@ -174,7 +183,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
     JsonObject msgRoot = doc.as<JsonObject>();
 
     // Test if parsing succeeds.
-    if (!destFilter.empty())
+    if (strlen(destFilter) > 0)
         msgRoot = msgRoot[destFilter];
     for (JsonPair kvp : msgRoot)
     {
@@ -187,8 +196,10 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const std::string &d
 
 bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 {
+    // if (cli != nullptr)
+    //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "callMessageHandler()");
     bool handlerFound = true;
-    auto keyStr = std::string(kvp.key().c_str());
+    auto keyStr = kvp.key().c_str();
     if (this->handlerTypes.find(keyStr) == this->handlerTypes.end())
     {
         handlerFound = false;
@@ -240,15 +251,24 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 
 void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 {
+    static int callCount = 0;
+
+    if (cli != nullptr)
+        // cli->printfDebugMessage("sendMessage: %d", callCount++);
+        cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, callCount++);
+
     if (sendOpt == ACTIVE_CONNECTION)
     {
-        if (cli != nullptr)
-        {
-            char msgBuff[JSON_PROGMEM_SIZE]{0};
-            msg.getMessageStr(msgBuff);
-            cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
-        }
-        WriteBufferingStream bufferedClient(*(activeConnection->client), std::strlen(msg.getBuffPtr()));
+        // if (cli != nullptr)
+        // {
+        //     char msgBuff[JSON_PROGMEM_SIZE]{0};
+        //     msg.getMessageStr(msgBuff);
+        //     cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
+        // }
+        auto sz = measureJson(msg.getJsonDoc());
+        auto chunkSize = sz < 64 ? sz : 64;
+        cli->printfDebugMessage("msgLen: %d", chunkSize);
+        WriteBufferingStream bufferedClient{*(activeConnection->client), chunkSize};
         serializeJson(msg.getJsonDoc(), bufferedClient);
         bufferedClient.flush();
         activeConnection->client->write('\0');
@@ -284,6 +304,8 @@ void LFAST::CommsMessage::getMessageStr(char *buff)
 
 void LFAST::CommsService::stopDisconnectedClients()
 {
+    // if (cli != nullptr)
+    //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "stopDisconnectedClients()");
     auto itr = connections.begin();
     while (itr != connections.end())
     {

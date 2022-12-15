@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
-#include <sstream>
 #include <cstring>
 
 
@@ -57,10 +56,12 @@ class CommsMessage
         StaticJsonDocument<JSON_PROGMEM_SIZE> &deserialize(TerminalInterface * debugCli=nullptr);
 
         template <typename T>
-        inline T getValue(const std::string &key);
+        inline T getValue(const char * key);
+    
         template <typename T>
-        inline void addKeyValuePair(const std::string & key, T val);
-        inline void addDestinationKey(const std::string & key);
+        inline void addKeyValuePair(const char * key, T val);
+        // inline void addKeyValuePair(const char *  key, T val);
+        inline void addDestinationKey(const char *  key);
 
         const char *getBuffPtr()
         {
@@ -75,7 +76,6 @@ class CommsMessage
         {
             return processed;
         }
-
     protected:
         StaticJsonDocument<JSON_PROGMEM_SIZE> JsonDoc;
         bool processed;
@@ -122,7 +122,7 @@ class CommsService : public LFAST_Device
 {
 
     protected:
-        static void defaultMessageHandler(std::string);
+        static void defaultMessageHandler(const char *);
         void errorMessageHandler(CommsMessage &msg);
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
@@ -145,7 +145,7 @@ class CommsService : public LFAST_Device
         std::unordered_map<std::string, MessageHandler<bool>> boolHandlers;
         std::unordered_map<std::string, MessageHandler<std::string>> stringHandlers;
         template <class T>
-        bool callMessageHandler(const std::string & key, T val);
+        bool callMessageHandler(const char *  key, T val);
 
     public:
         CommsService();
@@ -160,7 +160,7 @@ class CommsService : public LFAST_Device
         };
         virtual void sendMessage(CommsMessage &, uint8_t);
         template <class T>
-        inline bool registerMessageHandler(const std::string & key, MessageHandler<T> fn);
+        inline bool registerMessageHandler(const char *  key, MessageHandler<T> fn);
         inline bool callMessageHandler(JsonPair kvp);
 
         virtual bool Status()
@@ -171,8 +171,8 @@ class CommsService : public LFAST_Device
         bool checkForNewClientData();
         virtual bool checkForNewClients();
         virtual void stopDisconnectedClients();
-        virtual void processClientData(const std::string &);
-        virtual void processMessage(CommsMessage *, const std::string &);
+        virtual void processClientData(const char * );
+        virtual void processMessage(CommsMessage *, const char * );
         void setNoReplyFlag(bool f)
         {
             activeConnection->noReplyFlag = f;
@@ -181,7 +181,7 @@ class CommsService : public LFAST_Device
 
 // NOTE: Teensy build environment doesn't handle build flags properly, so can't use typeid().
 // template <class T>
-// bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<T> fn)
+// bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<T> fn)
 // {
 //     if (typeid(T) == typeid(int))
 //         this->intHandlers[key] = fn;
@@ -199,42 +199,42 @@ class CommsService : public LFAST_Device
 // }
 
 template <class T>
-bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<T> fn)
+bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<T> fn)
 {
     // TODO: Add exception handling
     return false;
 }
 
 template <>
-inline bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<int> fn)
+inline bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<int> fn)
 {
     this->intHandlers[key] = fn;
     this->handlerTypes[key] = INT_HANDLER;
     return true;
 }
 template <>
-inline bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<unsigned int> fn)
+inline bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<unsigned int> fn)
 {
     this->uIntHandlers[key] = fn;
     this->handlerTypes[key] = UINT_HANDLER;
     return true;
 }
 template <>
-inline bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<double> fn)
+inline bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<double> fn)
 {
     this->doubleHandlers[key] = fn;
     this->handlerTypes[key] = DOUBLE_HANDLER;
     return true;
 }
 template <>
-inline bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<bool> fn)
+inline bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<bool> fn)
 {
     this->boolHandlers[key] = fn;
     this->handlerTypes[key] = BOOL_HANDLER;
     return true;
 }
 template <>
-inline bool LFAST::CommsService::registerMessageHandler(const std::string & key, MessageHandler<std::string> fn)
+inline bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<std::string> fn)
 {
     this->stringHandlers[key] = fn;
     this->handlerTypes[key] = STRING_HANDLER;
@@ -242,7 +242,7 @@ inline bool LFAST::CommsService::registerMessageHandler(const std::string & key,
 }
 
 template <>
-inline bool LFAST::CommsService::callMessageHandler(const std::string & key, int val)
+inline bool LFAST::CommsService::callMessageHandler(const char *  key, int val)
 {
     auto mh = this->intHandlers[key];
     mh.call(val);
@@ -250,7 +250,7 @@ inline bool LFAST::CommsService::callMessageHandler(const std::string & key, int
 }
 
 template <>
-inline bool LFAST::CommsService::callMessageHandler(const std::string & key, unsigned int val)
+inline bool LFAST::CommsService::callMessageHandler(const char *  key, unsigned int val)
 {
     auto mh = this->uIntHandlers[key];
     mh.call(val);
@@ -258,7 +258,7 @@ inline bool LFAST::CommsService::callMessageHandler(const std::string & key, uns
 }
 
 template <>
-inline bool LFAST::CommsService::callMessageHandler(const std::string & key, double val)
+inline bool LFAST::CommsService::callMessageHandler(const char *  key, double val)
 {
     auto mh = this->doubleHandlers[key];
     mh.call(val);
@@ -266,7 +266,7 @@ inline bool LFAST::CommsService::callMessageHandler(const std::string & key, dou
 }
 
 template <>
-inline bool LFAST::CommsService::callMessageHandler(const std::string & key, bool val)
+inline bool LFAST::CommsService::callMessageHandler(const char *  key, bool val)
 {
     auto mh = this->boolHandlers[key];
     mh.call(val);
@@ -274,7 +274,7 @@ inline bool LFAST::CommsService::callMessageHandler(const std::string & key, boo
 }
 
 template <>
-inline bool LFAST::CommsService::callMessageHandler(const std::string & key, std::string val)
+inline bool LFAST::CommsService::callMessageHandler(const char *  key, std::string val)
 {
     auto mh = this->stringHandlers[key];
     mh.call(val);
@@ -282,36 +282,36 @@ inline bool LFAST::CommsService::callMessageHandler(const std::string & key, std
 }
 
 template <>
-inline double CommsMessage::getValue(const std::string & key)
+inline double CommsMessage::getValue(const char *  key)
 {
-    return (JsonDoc[key.c_str()].as<double>());
+    return (JsonDoc[key].as<double>());
 }
 
 template <>
-inline int CommsMessage::getValue(const std::string & key)
+inline int CommsMessage::getValue(const char *  key)
 {
-    return (JsonDoc[key.c_str()].as<int>());
+    return (JsonDoc[key].as<int>());
 }
 
 template <>
-inline unsigned int CommsMessage::getValue(const std::string & key)
+inline unsigned int CommsMessage::getValue(const char *  key)
 {
-    return (JsonDoc[key.c_str()].as<unsigned int>());
+    return (JsonDoc[key].as<unsigned int>());
 }
 
 template <>
-inline bool CommsMessage::getValue(const std::string & key)
+inline bool CommsMessage::getValue(const char *  key)
 {
-    return (JsonDoc[key.c_str()].as<bool>());
+    return (JsonDoc[key].as<bool>());
 }
 
 template <>
-inline std::string CommsMessage::getValue(const std::string & key)
+inline std::string CommsMessage::getValue(const char *  key)
 {
-    return (std::string(JsonDoc[key.c_str()].as<const char *>()));
+    return (std::string(JsonDoc[key].as<const char *>()));
 }
 
-inline void CommsMessage::addDestinationKey(const std::string & key)
+inline void CommsMessage::addDestinationKey(const char *  key)
 {
 
     // newDoc.createNestedObject(key);
@@ -337,12 +337,24 @@ inline void CommsMessage::addDestinationKey(const std::string & key)
     // JsonObject newObj = JsonDoc.
 }
 
+// template <typename T>
+// inline void CommsMessage::addKeyValuePair(const char *  key, T val)
+// {
+//     if (this->destKey.length() > 0)
+//         JsonDoc[(this->destKey)][key] = val;
+//     else
+//         JsonDoc[key] = val;
+// };
+
 template <typename T>
-inline void CommsMessage::addKeyValuePair(const std::string & key, T val)
+inline void CommsMessage::addKeyValuePair(const char * key, T val)
+{
 {
     if (this->destKey.length() > 0)
-        JsonDoc[this->destKey][key] = val;
+        JsonDoc[(this->destKey)][(key)] = val;
     else
-        JsonDoc[key] = val;
+        JsonDoc[(key)] = val;
 };
+}
+
 }
