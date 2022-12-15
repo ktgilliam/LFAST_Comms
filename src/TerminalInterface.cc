@@ -201,8 +201,6 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
     cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
     clearToEndOfRow();
-    printDebugMessage('   ');
-    printDebugMessage(fieldValStr);
     uint16_t maxStrLen = (TERMINAL_WIDTH - fieldStartCol);
     if (fieldValStr.length() > maxStrLen)
         serial->print(fieldValStr.substr(0, maxStrLen).c_str());

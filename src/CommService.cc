@@ -277,7 +277,7 @@ StaticJsonDocument<JSON_PROGMEM_SIZE> &LFAST::CommsMessage::deserialize(Terminal
 
 void LFAST::CommsMessage::getMessageStr(char *buff)
 {
-    TEST_SERIAL.println("getMessageStr");
+    // TEST_SERIAL.println("getMessageStr");
     StaticJsonDocument<JSON_PROGMEM_SIZE> docCopy = this->JsonDoc;
     serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
 }
