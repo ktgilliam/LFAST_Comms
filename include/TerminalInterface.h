@@ -129,3 +129,23 @@ void TerminalInterface::printfDebugMessage(const char *fmt, Args... args)
 }
 
 int fs_sexa(char *out, double a, int w, int fracbase);
+
+#include <sstream>
+inline std::string debugCodeIdStr(std::string file, int line)
+{
+
+    size_t pos = 0;
+    std::string token;
+    std::string delimiter = "/";
+    while ((pos = file.find(delimiter)) != std::string::npos)
+    {
+        token = file.substr(0, pos);
+        file.erase(0, pos + delimiter.length());
+    }
+
+    std::stringstream ss;
+    ss << file << "[" << line << "]";
+    return ss.str();
+}
+
+#define DEBUG_CODE_ID_STR debugCodeIdStr(__FILE__, __LINE__)

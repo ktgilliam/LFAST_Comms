@@ -56,6 +56,7 @@ void TerminalInterface::printHeader()
     serial->printf("%s", HEADER_LABEL_ROW.c_str());
     cursorToRow(LFAST::LOWER_HEADER);
     serial->printf("%s", HEADER_BORDER_STRING.c_str());
+    delay(500);
 }
 
 void TerminalInterface::resetPrompt()
@@ -192,7 +193,7 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     serial->print(fieldVal);
     clearToEndOfRow();
 }
-void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char* fmt)
+void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char *fmt)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
     uint8_t devicePrintRow = printRow + deviceRowOffs;
@@ -216,7 +217,7 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
         serial->print(fieldValStr.substr(0, maxStrLen).c_str());
     else
         serial->print(fieldValStr.c_str());
-    
+
     clearToEndOfRow();
     // showCursor();
 }
