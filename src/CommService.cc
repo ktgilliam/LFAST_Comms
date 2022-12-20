@@ -266,12 +266,12 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
             }
             return;
         }
-        // if (cli != nullptr)
-        // {
-        //     char msgBuff[JSON_PROGMEM_SIZE]{0};
-        //     msg.getMessageStr(msgBuff);
-        //     cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
-        // }
+        if (cli != nullptr)
+        {
+            char msgBuff[JSON_PROGMEM_SIZE]{0};
+            msg.getMessageStr(msgBuff);
+            cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
+        }
         if (activeConnection->client)
         {
 #define USE_BUFFERED_CLIENT 1
@@ -322,8 +322,9 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize(TerminalInterface *debugCl
 void LFAST::CommsMessage::getMessageStr(char *buff)
 {
     // TEST_SERIAL.println("getMessageStr");
-    // DynamicJsonDocument<JSON_PROGMEM_SIZE> docCopy = this->JsonDoc;
-    // serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
+    DynamicJsonDocument docCopy(JSON_PROGMEM_SIZE);
+    docCopy = this->JsonDoc;
+    serializeJson(docCopy, buff, JSON_PROGMEM_SIZE);
 }
 
 void LFAST::CommsService::stopDisconnectedClients()
