@@ -176,43 +176,50 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
     uint8_t devicePrintRow = printRow + deviceRowOffs;
-    hideCursor();
     uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    noInterrupts();
+    hideCursor();
     cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
     serial->print(fieldVal);
     clearToEndOfRow();
+    interrupts();
 }
 
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, long fieldVal)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
     uint8_t devicePrintRow = printRow + deviceRowOffs;
-    hideCursor();
     uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    noInterrupts();
+    hideCursor();
     cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
     serial->print(fieldVal);
     clearToEndOfRow();
+    interrupts();
 }
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char *fmt)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
     uint8_t devicePrintRow = printRow + deviceRowOffs;
-    hideCursor();
     uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    noInterrupts();
+    hideCursor();
     cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
     serial->printf(fmt, fieldVal);
     clearToEndOfRow();
+    interrupts();
 }
 
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, const std::string &fieldValStr)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
     uint8_t devicePrintRow = printRow + deviceRowOffs;
-    hideCursor();
     uint16_t adjustedPrintRow = devicePrintRow + LFAST::NUM_HEADER_ROWS;
+    uint16_t maxStrLen = (TERMINAL_WIDTH - fieldStartCol);
+    noInterrupts();
+    hideCursor();
     cursorToRowCol(adjustedPrintRow, fieldStartCol + 4);
     clearToEndOfRow();
-    uint16_t maxStrLen = (TERMINAL_WIDTH - fieldStartCol);
     if (fieldValStr.length() > maxStrLen)
         serial->print(fieldValStr.substr(0, maxStrLen).c_str());
     else
@@ -220,11 +227,11 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
 
     clearToEndOfRow();
     // showCursor();
+    interrupts();
 }
 
 void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
-    auto currentTime = millis();
 
     debugMessageCount++;
     std::string colorStr;
@@ -245,11 +252,11 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
     }
     std::stringstream ss;
     ss << std::setiosflags(std::ios::left) << std::setw(6);
-    ss << WHITE << debugMessageCount << "[" << currentTime << "]: " << colorStr << msg;
+    ss << WHITE << debugMessageCount << "[" << millis() << "]: " << colorStr << msg;
     std::string msgPrintSr = ss.str();
 
     // serial->printf("[%d]", debugMessageCount);
-
+    noInterrupts();
     if (debugMessages.size() < LFAST::MAX_DEBUG_ROWS)
     {
         cursorToRowCol((firstDebugRow + debugRowOffset++), 0);
@@ -269,6 +276,7 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
             // serial->printf(" [fdr:%d][dro:%d][ii:%d]", firstDebugRow, debugRowOffset, ii);
         }
     }
+    interrupts();
 }
 
 int fs_sexa(char *out, double a, int w, int fracbase)
