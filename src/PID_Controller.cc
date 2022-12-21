@@ -102,8 +102,8 @@ void PID_Controller::update(double e, double dt, double *uC)
     double prop_term{0};
     double int_term{0};
     double diff_term{0};
-    double output_pre_sat{0};
-    double output_post_sat{0};
+    // double output_pre_sat{0};
+    // double output_post_sat{0};
     double output{0};
 
     if (compensationMode & DIGITAL_CONTROL::P_BIT)
