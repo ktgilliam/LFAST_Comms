@@ -35,7 +35,7 @@ constexpr double INV_24 = 1 / 24.0;     // 0.04166666666666666666666666666666
 constexpr double INV_30 = 1 / 30.0;     // 0.03333333333333333333333333333333
 constexpr double INV_60 = 1 / 60.0;
 
-#define ENABLE_IF_ARITHMETIC(v) typename std::enable_if<std::is_arithmetic<v>::value>::type* = nullptr
+#define ENABLE_IF_ARITHMETIC(v) typename std::enable_if<std::is_arithmetic<v>::value>::type * = nullptr
 
 template <typename T, typename U, ENABLE_IF_ARITHMETIC(T), ENABLE_IF_ARITHMETIC(U)>
 inline T ulim(T val, U upper)
@@ -207,34 +207,39 @@ inline double atan2d(T Y, U X)
     return rad2deg(std::atan2(deg2rad(Y), deg2rad(X)));
 }
 
-template <typename T , std::size_t N, ENABLE_IF_ARITHMETIC(T)>
+#include <iostream>
+template <typename T, std::size_t N, ENABLE_IF_ARITHMETIC(T)>
 class vectorX
 {
 private:
+    T e[N];
 
 public:
-
     template <typename... vals>
     vectorX(vals... v)
-    : e{v...}
-    {}
+        : e{v...}
+    {
+    }
 
-
-    // std::size_t len() { return N; }
+    std::size_t len() { return N; }
     T operator[](size_t i) const { return e[i]; }
 
+    T &operator[](size_t i) { return e[i]; }
 
-    void normalize()
+    T magnitude()
     {
         T sumSquares = 0;
         for (size_t ii = 0; ii < N; ii++)
             sumSquares += e[ii] * e[ii];
-        T magDiv = 1.0 / sqrt(sumSquares);
+        T mag = sqrt(sumSquares);
+        return mag;
+    }
+    void normalize()
+    {
+        T magDiv = 1.0 / magnitude();
         for (size_t ii = 0; ii < N; ii++)
             e[ii] *= magDiv;
     }
-
-    T e[N];
 };
 
 // #undef RAD_TO_DEG
