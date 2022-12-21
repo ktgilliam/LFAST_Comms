@@ -220,7 +220,7 @@ T mean(Args ... args)
     if (numArgs == 0)
         return T(); // If there are no arguments, just return the default value of that type
 
-    T total;
+    T total{0};
     for (auto value : {args...})
         total += value;
 
