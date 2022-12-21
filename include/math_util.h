@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <type_traits>
 
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433832795
@@ -34,19 +35,21 @@ constexpr double INV_24 = 1 / 24.0;     // 0.04166666666666666666666666666666
 constexpr double INV_30 = 1 / 30.0;     // 0.03333333333333333333333333333333
 constexpr double INV_60 = 1 / 60.0;
 
-template <typename T, typename U>
+#define ENABLE_IF_ARITHMETIC(v) typename std::enable_if<std::is_arithmetic<v>::value>::type* = nullptr
+
+template <typename T, typename U, ENABLE_IF_ARITHMETIC(T), ENABLE_IF_ARITHMETIC(U)>
 inline T ulim(T val, U upper)
 {
     return val < upper ? val : upper;
 }
 
-template <typename T, typename U>
+template <typename T, typename U, ENABLE_IF_ARITHMETIC(T), ENABLE_IF_ARITHMETIC(U)>
 inline T llim(T val, U lower)
 {
     return val > lower ? val : lower;
 }
 
-template <typename T, typename U, typename V>
+template <typename T, typename U, typename V, ENABLE_IF_ARITHMETIC(T), ENABLE_IF_ARITHMETIC(U), ENABLE_IF_ARITHMETIC(V)>
 inline T saturate(T val, U lower, V upper)
 {
     T val1 = llim(val, lower);
@@ -57,7 +60,7 @@ inline T saturate(T val, U lower, V upper)
     return val2;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline int sign(T val)
 {
     if (val == 0.0)
@@ -66,174 +69,173 @@ inline int sign(T val)
         return std::signbit(val) ? -1 : 1;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double hrs2rad(T val)
 {
     constexpr double mult = 2 * M_PI * INV_24;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double hrs2deg(T val)
 {
     constexpr double mult = 360.0 * INV_24;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double rad2hrs(T val)
 {
     constexpr double mult = 24.0 * INV_2_PI;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double deg2hrs(T val)
 {
     constexpr double mult = 24.0 * INV_360;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double rad2deg(T val)
 {
     constexpr double mult = 180.0 * INV_PI;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double deg2rad(T val)
 {
     constexpr double mult = M_PI * INV_180;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double arcsec2deg(T val)
 {
     return val * INV_3600;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double deg2arcsec(T val)
 {
     return val * 3600.0;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double arcsec2rad(T val)
 {
     constexpr double mult = INV_3600 * INV_180 * M_PI;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double rad2arcsec(T val)
 {
     constexpr double mult = 3600.0 * 180.0 * INV_PI;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double radpersec2RPM(T val)
 {
     constexpr double mult = 30.0 * INV_PI;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double RPM2radpersec(T val)
 {
     constexpr double mult = M_PI * INV_30;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double degpersec2RPM(T val)
 {
     constexpr double mult = 60 * INV_360;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double RPM2degpersec(T val)
 {
     constexpr double mult = 360 * INV_60;
     return val * mult;
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double sind(T val)
 {
     return rad2deg(std::sin(deg2rad(val)));
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double cosd(T val)
 {
     return rad2deg(std::cos(deg2rad(val)));
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double tand(T val)
 {
     return rad2deg(std::tan(deg2rad(val)));
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double asind(T val)
 {
     return rad2deg(std::asin(deg2rad(val)));
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double acosd(T val)
 {
     return rad2deg(std::acos(deg2rad(val)));
 }
 
-template <typename T>
+template <typename T, ENABLE_IF_ARITHMETIC(T)>
 inline double atand(T val)
 {
     return rad2deg(std::atan(deg2rad(val)));
 }
 
-template <typename T, typename U>
+template <typename T, typename U, ENABLE_IF_ARITHMETIC(T), ENABLE_IF_ARITHMETIC(U)>
 inline double atan2d(T Y, U X)
 {
     return rad2deg(std::atan2(deg2rad(Y), deg2rad(X)));
 }
 
-template <typename T, std::size_t N>
+template <typename T , std::size_t N, ENABLE_IF_ARITHMETIC(T)>
 class vectorX
 {
-    private:
-    // template <typename... vals>
-    // void assign(T v, vals... rest)
-    // {
-    //     e[idx] = v;
-    // }
-    public:
-    T e[N];
-    std::size_t len() {return N;}
-    T operator()(size_t i) const {return e[i];}
+private:
+
+public:
+
     template <typename... vals>
-    // vectorX(vals... v)
+    vectorX(vals... v)
+    : e{v...}
+    {}
+
+
+    // std::size_t len() { return N; }
+    T operator[](size_t i) const { return e[i]; }
+
+
+    // void normalize()
     // {
-
-
+    //     T sumSquares = 0;
+    //     for (size_t ii = 0; ii < N; ii++)
+    //         sumSquares += e[ii] * e[ii];
+    //     T magDiv = 1.0 / sqrt(sumSquares);
+    //     for (size_t ii = 0; ii < N; ii++)
+    //         e[ii] *= magDiv;
     // }
-    // T int GetArrLength(T (&)[size]) { return size; }
-    void normalize()
-    {
-        T sumSquares = 0;
-        for (size_t ii = 0; ii < N; ii++)
-            sumSquares += e[ii]*e[ii];
-        T magDiv = 1.0/sqrt(sumSquares);
-        for (size_t ii = 0; ii < N; ii++)
-            e[ii] *= magDiv;
-    }
+
+    T e[N];
 };
 
-#undef RAD_TO_DEG
-#undef DEG_TO_RAD
+// #undef RAD_TO_DEG
+// #undef DEG_TO_RAD

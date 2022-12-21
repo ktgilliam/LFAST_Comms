@@ -26,19 +26,6 @@ FetchContent_MakeAvailable(googletest)
 #========================================= project test executables ==============================#
 #=================================================================================================#
 
-#### Bash Wrapper tests
-add_executable(
-  bash_wrapper_tests
-  bash_wrapper_tests.cc
-)
-
-target_link_libraries(
-  bash_wrapper_tests
-  bash_wrapper
-  GTest::gtest_main
-)
-
-
 add_executable(
   math_util_tests
   math_util_tests.cc
@@ -50,6 +37,5 @@ target_link_libraries(
 
 #### Bringing it all together
 include(GoogleTest)
-gtest_discover_tests(bash_wrapper_tests)
 gtest_discover_tests(math_util_tests)
 

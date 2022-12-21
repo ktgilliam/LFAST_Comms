@@ -16,6 +16,7 @@
 # define TEST_M_SQRT1_2	0.70710678118654752440	/* 1/sqrt(2) */
 
 #define THRESH 0.00000000000000001
+
 TEST(math_util_tests, testdeg2rad)
 {
     double test1_90 = 90.0;
@@ -28,3 +29,34 @@ TEST(math_util_tests, testdeg2rad)
     double test2_correct_answer = 90.0;
     EXPECT_NEAR(test2_90, test2_correct_answer, THRESH);
 }
+
+TEST(math_util_tests, testVectorDefaultInit)
+{
+    vectorX<double, 3> v;
+    ASSERT_EQ(v[0], 0);
+    ASSERT_EQ(v[1], 0);
+    ASSERT_EQ(v[2], 0);
+}
+
+TEST(math_util_tests, testVectorNonDefaultInit)
+{
+    vectorX<int, 3> v(1,2,3);
+
+    ASSERT_EQ(v[0], 1);
+    ASSERT_EQ(v[1], 2);
+    ASSERT_EQ(v[2], 3);
+}
+
+// TEST(math_util_tests, testNoObjectVectors)
+// {
+//     typedef struct 
+//     {
+//         int a;
+//         int b;
+//     }testStruct;
+    
+//     vectorX<testStruct, 3> v1;
+//     // ASSERT_EQ(v[0], 1);
+//     // ASSERT_EQ(v[1], 2);
+//     // ASSERT_EQ(v[2], 3);
+// }
