@@ -10,7 +10,7 @@
 #endif
 
 #ifndef M_PI_2
-#define M_PI_2		1.57079632679489661923	/* pi/2 */
+#define M_PI_2 1.57079632679489661923 /* pi/2 */
 #endif
 
 #ifndef M_SQRT2
@@ -25,14 +25,14 @@
 #define M_SQRT2 1.41421356237309504880168872420969807856967187537694
 #endif
 
-constexpr double INV_PI    = 1/M_PI; //0.31830988618379067153776752674502
-constexpr double INV_2_PI  = 0.5/M_PI; //0.15915494309189533576888376337251
-constexpr double INV_180 = 1/180.0; //0.00555555555555555555555555555556
-constexpr double INV_360  =  1/360.0; //0.00277777777777777777777777777778
-constexpr double INV_3600  = 1/3600.0; //0.00027777777777777777777777777778
-constexpr double INV_24    = 1/24.0; //0.04166666666666666666666666666666
-constexpr double INV_30    = 1/30.0; //0.03333333333333333333333333333333
-constexpr double INV_60    = 1/60.0; 
+constexpr double INV_PI = 1 / M_PI;     // 0.31830988618379067153776752674502
+constexpr double INV_2_PI = 0.5 / M_PI; // 0.15915494309189533576888376337251
+constexpr double INV_180 = 1 / 180.0;   // 0.00555555555555555555555555555556
+constexpr double INV_360 = 1 / 360.0;   // 0.00277777777777777777777777777778
+constexpr double INV_3600 = 1 / 3600.0; // 0.00027777777777777777777777777778
+constexpr double INV_24 = 1 / 24.0;     // 0.04166666666666666666666666666666
+constexpr double INV_30 = 1 / 30.0;     // 0.03333333333333333333333333333333
+constexpr double INV_60 = 1 / 60.0;
 
 template <typename T, typename U>
 inline T ulim(T val, U upper)
@@ -69,7 +69,7 @@ inline int sign(T val)
 template <typename T>
 inline double hrs2rad(T val)
 {
-    constexpr double mult = 2*M_PI * INV_24;
+    constexpr double mult = 2 * M_PI * INV_24;
     return val * mult;
 }
 
@@ -104,10 +104,9 @@ inline double rad2deg(T val)
 template <typename T>
 inline double deg2rad(T val)
 {
-    constexpr double mult = M_PI  * INV_180;
+    constexpr double mult = M_PI * INV_180;
     return val * mult;
 }
-
 
 template <typename T>
 inline double arcsec2deg(T val)
@@ -149,7 +148,6 @@ inline double RPM2radpersec(T val)
     return val * mult;
 }
 
-
 template <typename T>
 inline double degpersec2RPM(T val)
 {
@@ -163,7 +161,6 @@ inline double RPM2degpersec(T val)
     constexpr double mult = 360 * INV_60;
     return val * mult;
 }
-
 
 template <typename T>
 inline double sind(T val)
@@ -207,6 +204,36 @@ inline double atan2d(T Y, U X)
     return rad2deg(std::atan2(deg2rad(Y), deg2rad(X)));
 }
 
+template <typename T, std::size_t N>
+class vectorX
+{
+    private:
+    // template <typename... vals>
+    // void assign(T v, vals... rest)
+    // {
+    //     e[idx] = v;
+    // }
+    public:
+    T e[N];
+    std::size_t len() {return N;}
+    T operator()(size_t i) const {return e[i];}
+    template <typename... vals>
+    // vectorX(vals... v)
+    // {
+
+
+    // }
+    // T int GetArrLength(T (&)[size]) { return size; }
+    void normalize()
+    {
+        T sumSquares = 0;
+        for (size_t ii = 0; ii < N; ii++)
+            sumSquares += e[ii]*e[ii];
+        T magDiv = 1.0/sqrt(sumSquares);
+        for (size_t ii = 0; ii < N; ii++)
+            e[ii] *= magDiv;
+    }
+};
 
 #undef RAD_TO_DEG
 #undef DEG_TO_RAD
