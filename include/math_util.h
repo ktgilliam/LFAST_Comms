@@ -224,15 +224,15 @@ public:
     T operator[](size_t i) const { return e[i]; }
 
 
-    // void normalize()
-    // {
-    //     T sumSquares = 0;
-    //     for (size_t ii = 0; ii < N; ii++)
-    //         sumSquares += e[ii] * e[ii];
-    //     T magDiv = 1.0 / sqrt(sumSquares);
-    //     for (size_t ii = 0; ii < N; ii++)
-    //         e[ii] *= magDiv;
-    // }
+    void normalize()
+    {
+        T sumSquares = 0;
+        for (size_t ii = 0; ii < N; ii++)
+            sumSquares += e[ii] * e[ii];
+        T magDiv = 1.0 / sqrt(sumSquares);
+        for (size_t ii = 0; ii < N; ii++)
+            e[ii] *= magDiv;
+    }
 
     T e[N];
 };
