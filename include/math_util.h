@@ -208,13 +208,13 @@ inline double atan2d(T Y, U X)
 }
 
 template <typename T, typename... Rest>
-inline double sum(T t, Rest... rest) 
+inline double sum(T t, Rest... rest)
 {
-  return t + sum(rest...);
+    return t + sum(rest...);
 }
 
-template<typename T, class ... Args>
-T mean(Args ... args)
+template <typename T, class... Args>
+T mean(Args... args)
 {
     int numArgs = sizeof...(args);
     if (numArgs == 0)
@@ -224,9 +224,8 @@ T mean(Args ... args)
     for (auto value : {args...})
         total += value;
 
-    return total / numArgs;   // Simple arithmetic average (sum divided by total)
+    return total / numArgs; // Simple arithmetic average (sum divided by total)
 }
-
 
 template <typename T, std::size_t N, ENABLE_IF_ARITHMETIC(T)>
 class vectorX
@@ -256,9 +255,13 @@ public:
     }
     void normalize()
     {
-        T magDiv = 1.0 / magnitude();
-        for (size_t ii = 0; ii < N; ii++)
-            e[ii] *= magDiv;
+        T mag = magnitude();
+        if (mag > 0)
+        {
+            T magDiv = 1.0 / mag;
+            for (size_t ii = 0; ii < N; ii++)
+                e[ii] *= magDiv;
+        }
     }
 };
 
