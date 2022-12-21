@@ -71,9 +71,15 @@ TEST(math_util_tests, testNormalizeVector)
 {
     vectorX<double, 3> v(1.0, 2.0, 3.0);
     v.normalize();
-    
+
     double magDiv = 1.0 / sqrt(14.0);
     EXPECT_FLOAT_EQ(v[0], 1.0 * magDiv);
     EXPECT_FLOAT_EQ(v[1], 2.0 * magDiv);
     EXPECT_FLOAT_EQ(v[2], 3.0 * magDiv);
+}
+
+TEST(math_util_tests, testMeanFunction)
+{
+    double meanVal = mean<double>(1.0, 2.0, 3.0);
+    EXPECT_FLOAT_EQ(meanVal, 2.0 );
 }

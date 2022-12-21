@@ -207,7 +207,27 @@ inline double atan2d(T Y, U X)
     return rad2deg(std::atan2(deg2rad(Y), deg2rad(X)));
 }
 
-#include <iostream>
+template <typename T, typename... Rest>
+inline double sum(T t, Rest... rest) 
+{
+  return t + sum(rest...);
+}
+
+template<typename T, class ... Args>
+T mean(Args ... args)
+{
+    int numArgs = sizeof...(args);
+    if (numArgs == 0)
+        return T(); // If there are no arguments, just return the default value of that type
+
+    T total;
+    for (auto value : {args...})
+        total += value;
+
+    return total / numArgs;   // Simple arithmetic average (sum divided by total)
+}
+
+
 template <typename T, std::size_t N, ENABLE_IF_ARITHMETIC(T)>
 class vectorX
 {
