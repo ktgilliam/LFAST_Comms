@@ -40,21 +40,23 @@ public:
     bool outputIsSaturated();
 
 private:
-    struct limits
-    {
-        double ulim;
-        double llim;
-    };
 
     double Kp;
     double Ki;
     double Kd;
 
+    bool limit_integrator;
+    bool limit_output;
     double integratorState;
+    bool outputSaturatedFlag;
     double e_prev;
     bool firstTime;
-    bool outputSaturatedFlag;
 
+    struct limits
+    {
+        double ulim;
+        double llim;
+    };
     struct limits integrator_limits
     {
         DIGITAL_CONTROL::pos_inf, DIGITAL_CONTROL::neg_inf
@@ -64,8 +66,6 @@ private:
         DIGITAL_CONTROL::pos_inf, DIGITAL_CONTROL::neg_inf
     };
 
-    bool limit_integrator;
-    bool limit_output;
     uint8_t compensationMode;
     void configureCompMode();
     // bool anti_windup;
