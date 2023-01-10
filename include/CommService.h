@@ -237,14 +237,6 @@ namespace LFAST
         return true;
     }
 
-    // template <>
-    // inline bool LFAST::CommsService::registerMessageHandler(const char *  key, MessageHandler<std::string> fn)
-    // {
-    //     this->stringHandlers[key] = fn;
-    //     this->handlerTypes[key] = STRING_HANDLER;
-    //     return true;
-    // }
-
     template <>
     inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<const char *> fn)
     {
