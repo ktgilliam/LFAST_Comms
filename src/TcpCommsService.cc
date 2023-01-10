@@ -53,7 +53,6 @@ LFAST::TcpCommsService::TcpCommsService(byte *ipBytes)
 LFAST::TcpCommsService::TcpCommsService()
 {
     ip = IPAddress(0, 0, 0, 0);
-    // this->commsServiceStatus = initializeEnetIface();
 }
 
 bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
@@ -63,7 +62,6 @@ bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
 
     if (!hardwareConfigurationDone)
     {
-        // Serial2.println("Initializing Ethernet... ");
         getTeensyMacAddr(mac);
         // initialize the Ethernet device
         Ethernet.begin(mac, ip);
@@ -72,12 +70,14 @@ bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
         // Check for Ethernet hardware present
         if (Ethernet.hardwareStatus() == EthernetNoHardware)
         {
-            // Serial2.println("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
+            if (cli != nullptr)
+                cli->printfDebugMessage("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
             initResult = false;
         }
         hardwareConfigurationDone = true;
     }
-    if(initResult) commsServiceStatus = true;
+    if (initResult)
+        commsServiceStatus = true;
     return commsServiceStatus;
 }
 
@@ -89,7 +89,8 @@ bool LFAST::TcpCommsService::checkForNewClients()
     if (newClient)
     {
         newClientFlag = true;
-        // Serial2.printf("Connection # %d Made.\r\n", connections.size() + 1);
+        if (cli != nullptr)
+            cli->printfDebugMessage("Connection # %d Made.\r\n", connections.size() + 1);
         // Once we "accept", the client is no longer tracked by EthernetServer
         // so we must store it into our list of clients
         enetClients.push_back(newClient);
