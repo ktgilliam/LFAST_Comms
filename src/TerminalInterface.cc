@@ -56,7 +56,7 @@ void TerminalInterface::printHeader()
     serial->printf("%s", HEADER_LABEL_ROW.c_str());
     cursorToRow(LFAST::LOWER_HEADER);
     serial->printf("%s", HEADER_BORDER_STRING.c_str());
-    delay(500);
+    delay(100);
 }
 
 void TerminalInterface::resetPrompt()
@@ -251,7 +251,7 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
         break;
     }
     std::stringstream ss;
-    ss << std::setiosflags(std::ios::left) << std::setw(6);
+    ss << std::setiosflags(std::ios::left) << std::setw(12);
     ss << WHITE << debugMessageCount << "[" << millis() << "]: " << colorStr << msg;
     std::string msgPrintSr = ss.str();
 
