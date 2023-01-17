@@ -121,7 +121,8 @@
 
 #define DEBUG_PIN_1 32
 
-#define TOGGLE_DEBUG_PIN() digitalWrite(DEBUG_PIN_1, !digitalRead(DEBUG_PIN_1));
-
+#define TOGGLE_DEBUG_PIN() digitalWrite(DEBUG_PIN_1, !digitalRead(DEBUG_PIN_1))
+#define SET_DEBUG_PIN() digitalWrite(DEBUG_PIN_1, 1);
+#define CLEAR_DEBUG_PIN() digitalWrite(DEBUG_PIN_1, 0);
 #define TOGGLE_LED_PIN() digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 
