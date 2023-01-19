@@ -15,7 +15,10 @@
 #define RX_BUFF_SIZE 1024
 
 #define MAX_KV_PAIRS 20
+#define MAX_ARRAY_SIZE 16
+#define JSON_ARRAY_CAPACITY JSON_ARRAY_SIZE(MAX_ARRAY_SIZE)
 #define JSON_PROGMEM_SIZE JSON_OBJECT_SIZE(MAX_KV_PAIRS)
+
 
 #define MAX_CTRL_MESSAGES 0x40U // can be increased if needed
 
@@ -88,7 +91,8 @@ namespace LFAST
     struct MessageHandler
     {
         void (*MsgHandlerFn)(T);
-
+        unsigned int numVals;
+        
         MessageHandler()
         {
             this->MsgHandlerFn = nullptr;
@@ -109,6 +113,8 @@ namespace LFAST
             }
             return false;
         }
+
+
     };
 
     struct ClientConnection
@@ -138,7 +144,7 @@ namespace LFAST
             UINT_HANDLER,
             DOUBLE_HANDLER,
             BOOL_HANDLER,
-            STRING_HANDLER
+            STRING_HANDLER,
         };
         std::unordered_map<std::string, HandlerType> handlerTypes;
         std::unordered_map<std::string, MessageHandler<int>> intHandlers;
@@ -163,7 +169,7 @@ namespace LFAST
         };
         virtual void sendMessage(CommsMessage &, uint8_t);
         template <class T>
-        inline bool registerMessageHandler(const char *key, MessageHandler<T> fn);
+        inline bool registerMessageHandler(const char *key, MessageHandler<T> fn, unsigned int numVals=1);
         inline bool callMessageHandler(JsonPair kvp);
 
         virtual bool Status()
@@ -202,35 +208,36 @@ namespace LFAST
     // }
 
     template <class T>
-    bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<T> fn)
+    bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<T> fn, unsigned int numVals)
     {
         // TODO: Add exception handling
         return false;
     }
 
     template <>
-    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<int> fn)
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<int> fn, unsigned int numVals)
     {
+        
         this->intHandlers[key] = fn;
         this->handlerTypes[key] = INT_HANDLER;
         return true;
     }
     template <>
-    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<unsigned int> fn)
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<unsigned int> fn, unsigned int numVals)
     {
         this->uIntHandlers[key] = fn;
         this->handlerTypes[key] = UINT_HANDLER;
         return true;
     }
     template <>
-    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<double> fn)
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<double> fn, unsigned int numVals)
     {
         this->doubleHandlers[key] = fn;
         this->handlerTypes[key] = DOUBLE_HANDLER;
         return true;
     }
     template <>
-    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<bool> fn)
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<bool> fn, unsigned int numVals)
     {
         this->boolHandlers[key] = fn;
         this->handlerTypes[key] = BOOL_HANDLER;
@@ -238,12 +245,13 @@ namespace LFAST
     }
 
     template <>
-    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<const char *> fn)
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<const char *> fn, unsigned int numVals)
     {
         this->stringHandlers[key] = fn;
         this->handlerTypes[key] = STRING_HANDLER;
         return true;
     }
+
     template <>
     inline bool LFAST::CommsService::callMessageHandler(const char *key, int val)
     {
