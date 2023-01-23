@@ -16,7 +16,7 @@
 #include <utility>
 
 #include "teensy41_device.h"
-
+#if defined(TERMINAL_ENABLED)
 TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint32_t _baud = 230400)
     : serial(_serial), ifLabel(_label)
 {
@@ -337,3 +337,4 @@ int fs_sexa(char *out, double a, int w, int fracbase)
 
     return (out - out0);
 }
+#endif

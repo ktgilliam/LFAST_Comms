@@ -2,7 +2,7 @@
 #include <cstring>
 #include <cstdio>
 // #include "teensy41_device.h"
-
+#if defined(TERMINAL_ENABLED)
 TerminalInterface *LFAST_Device::cli = nullptr;
 
 void LFAST_Device::connectTerminalInterface(TerminalInterface *_cli)
@@ -33,3 +33,4 @@ void LFAST_Device::connectTerminalInterface(TerminalInterface *_cli, const char 
     deviceNamed = true;
     connectTerminalInterface(_cli);
 }
+#endif

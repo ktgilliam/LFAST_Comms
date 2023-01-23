@@ -29,20 +29,24 @@ void LFAST::CommsService::setupClientMessageBuffers(Client *client)
 
 void LFAST::CommsService::defaultMessageHandler(const char *info)
 {
+    #if defined(TERMINAL_ENABLED)
     if (cli != nullptr)
     {
         cli->printfDebugMessage("Unregistered Message: [%s].\r\n", info);
     }
+    #endif
 }
 
 void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
 {
+    #if defined(TERMINAL_ENABLED)
     if (cli != nullptr)
     {
         char msgBuff[JSON_PROGMEM_SIZE]{0};
         msg.getMessageStr(msgBuff);
         cli->printfDebugMessage("Invalid Message: %s", msgBuff);
     }
+    #endif
 }
 
 bool LFAST::CommsService::checkForNewClients()
@@ -104,10 +108,12 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                 if (objectDone)
                 {
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
+                    #if defined(TERMINAL_ENABLED)
                     if (cli != nullptr)
                     {
                         cli->updatePersistentField(DeviceName, RAW_MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
                     }
+                    #endif
                     connection.rxMessageQueue.push_back(newMsg);
                     break;
                 }
@@ -255,8 +261,8 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 
 void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 {
-    static int callCount = 0;
 #if defined(TERMINAL_ENABLED)
+    static int callCount = 0;
     if (cli != nullptr)
         cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, callCount++);
 #endif
@@ -316,8 +322,8 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize()
 {
     if (this->jsonInputBuffer != nullptr)
     {
-        DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
 #if defined(TERMINAL_ENABLED)
+        DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
         if (error)
         {
             if (debugCli != nullptr)
@@ -325,6 +331,8 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize()
                 debugCli->printfDebugMessage("deserializeJson() failed: %s", error.c_str());
             }
         }
+        #else
+         deserializeJson(this->JsonDoc, this->jsonInputBuffer);
 #endif
     }
     else
