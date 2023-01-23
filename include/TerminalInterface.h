@@ -8,6 +8,9 @@
 #include <map>
 #include <cstdio>
 
+#include <teensy41_device.h>
+
+#if defined(TERMINAL_ENABLED)
 #define CLI_BUFF_LENGTH 90
 
 #define RED "\033[31m"
@@ -26,10 +29,10 @@ namespace LFAST
 {
     enum
     {
-        INFO = 0,
-        DEBUG = 1,
-        WARNING = 2,
-        ERROR = 3
+        INFO_MESSAGE = 0,
+        DEBUG_MESSAGE = 1,
+        WARNING_MESSAGE = 2,
+        ERROR_MESSAGE = 3
     };
 
     enum CLI_HEADER_ROWS
@@ -85,7 +88,7 @@ public:
     // void printDebugMessage(std::string&, uint8_t);
     template <typename... Args>
     void printfDebugMessage(const char *fmt, Args... args);
-    void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
+    void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO_MESSAGE);
 
     void printHeader();
     void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);
@@ -149,3 +152,5 @@ inline std::string debugCodeIdStr(std::string file, int line)
 }
 
 #define DEBUG_CODE_ID_STR debugCodeIdStr(__FILE__, __LINE__)
+
+#endif

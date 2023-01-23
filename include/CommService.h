@@ -48,14 +48,17 @@ namespace LFAST
         }
         virtual ~CommsMessage() {}
         virtual void placeholder() {}
-        void printMessageInfo(TerminalInterface *debugCli = nullptr);
+
         void getMessageStr(char *);
         DynamicJsonDocument &getJsonDoc()
         {
             return this->JsonDoc;
         }
+#if defined(TERMINAL_ENABLED)
         DynamicJsonDocument &deserialize(TerminalInterface *debugCli = nullptr);
-
+#else
+    DynamicJsonDocument &deserialize();
+#endif
         template <typename T>
         inline T getValue(const char *key);
 
@@ -77,7 +80,9 @@ namespace LFAST
         {
             return processed;
         }
-
+#if defined(TERMINAL_ENABLED)
+        void printMessageInfo(TerminalInterface *debugCli = nullptr);
+#endif
     protected:
         DynamicJsonDocument JsonDoc;
         bool processed;
@@ -129,8 +134,10 @@ namespace LFAST
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
         bool commsServiceStatus;
-        virtual void setupPersistentFields() override;
 
+        #if defined(TERMINAL_ENABLED)
+        virtual void setupPersistentFields() override;
+#endif
     private:
         enum HandlerType
         {

@@ -70,8 +70,10 @@ bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
         // Check for Ethernet hardware present
         if (Ethernet.hardwareStatus() == EthernetNoHardware)
         {
+            #if defined(TERMINAL_ENABLED)
             if (cli != nullptr)
                 cli->printfDebugMessage("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
+                #endif
             initResult = false;
         }
         hardwareConfigurationDone = true;
@@ -89,8 +91,10 @@ bool LFAST::TcpCommsService::checkForNewClients()
     if (newClient)
     {
         newClientFlag = true;
+        #if defined(TERMINAL_ENABLED)
         if (cli != nullptr)
             cli->printfDebugMessage("Connection # %d Made.\r\n", connections.size() + 1);
+            #endif
         // Once we "accept", the client is no longer tracked by EthernetServer
         // so we must store it into our list of clients
         enetClients.push_back(newClient);
