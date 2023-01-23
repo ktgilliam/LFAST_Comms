@@ -88,7 +88,7 @@ public:
     // void printDebugMessage(std::string&, uint8_t);
     template <typename... Args>
     void printfDebugMessage(const char *fmt, Args... args);
-    void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO);
+    void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO_MESSAGE);
 
     void printHeader();
     void addPersistentField(const std::string &device, const std::string &label, uint8_t printRow);

@@ -237,16 +237,16 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
     std::string colorStr;
     switch (level)
     {
-    case LFAST::INFO:
+    case LFAST::INFO_MESSAGE:
         colorStr = WHITE;
         break;
-    case LFAST::DEBUG:
+    case LFAST::DEBUG_MESSAGE:
         colorStr = GREEN;
         break;
-    case LFAST::WARNING:
+    case LFAST::WARNING_MESSAGE:
         colorStr = YELLOW;
         break;
-    case LFAST::ERROR:
+    case LFAST::ERROR_MESSAGE:
         colorStr = RED;
         break;
     }
