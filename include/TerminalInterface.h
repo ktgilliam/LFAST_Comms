@@ -8,6 +8,8 @@
 #include <map>
 #include <cstdio>
 
+#include <teensy41_device.h>
+
 #define CLI_BUFF_LENGTH 90
 
 #define RED "\033[31m"

@@ -213,32 +213,33 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
         {
         case INT_HANDLER:
         {
-            auto val = kvp.value().as<int>();
-            this->callMessageHandler<int>(keyStr, val);
+            auto val = kvp.value();
+            // auto val = kvp.value().as<int>();
+            this->callMessageHandler<int>(keyStr, &val);
         }
         break;
         case UINT_HANDLER:
         {
             auto val = kvp.value().as<unsigned int>();
-            this->callMessageHandler<unsigned int>(keyStr, val);
+            this->callMessageHandler<unsigned int>(keyStr, &val);
         }
         break;
         case DOUBLE_HANDLER:
         {
             auto val = kvp.value().as<double>();
-            this->callMessageHandler<double>(keyStr, val);
+            this->callMessageHandler<double>(keyStr, &val);
         }
         break;
         case BOOL_HANDLER:
         {
             auto val = kvp.value().as<bool>();
-            this->callMessageHandler<bool>(keyStr, val);
+            this->callMessageHandler<bool>(keyStr, &val);
         }
         break;
         case STRING_HANDLER:
         {
             auto val = kvp.value().as<const char *>();
-            this->callMessageHandler<const char *>(keyStr, val);
+            this->callMessageHandler<const char *>(keyStr, &val);
         }
         break;
         default:

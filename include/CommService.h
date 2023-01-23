@@ -50,6 +50,7 @@ namespace LFAST
         virtual void placeholder() {}
         void printMessageInfo(TerminalInterface *debugCli = nullptr);
         void getMessageStr(char *);
+
         DynamicJsonDocument &getJsonDoc()
         {
             return this->JsonDoc;
@@ -84,21 +85,32 @@ namespace LFAST
         std::string destKey;
     };
 
-    template <class T>
-    struct MessageHandler
+    template <class T, size_t N=1>
+    class MessageHandler
     {
-        void (*MsgHandlerFn)(T);
+        public:
+        void (*MsgHandlerFn)(T*);
+        T (*valArrayPtr)[N];
 
         MessageHandler()
         {
             this->MsgHandlerFn = nullptr;
         }
-
-        MessageHandler(void (*ptr)(T))
+        
+        MessageHandler(void (*ptr)(T*))
         {
             this->MsgHandlerFn = ptr;
         }
+
+        MessageHandler( const MessageHandler& mh)
+        {
+            this->MsgHandlerFn = mh->MsgHandlerFn;
+            valArrayPtr = mh->valArrayPtr;
+        }
+
         virtual ~MessageHandler(){};
+
+        size_t numVals() {return N;}
 
         bool call(T val)
         {
@@ -148,7 +160,7 @@ namespace LFAST
         // std::unordered_map<std::string, MessageHandler<std::string>> stringHandlers;
         std::unordered_map<std::string, MessageHandler<const char *>> stringHandlers;
         template <class T>
-        bool callMessageHandler(const char *key, T val);
+        bool callMessageHandler(const char *key, JsonArray val);
 
     public:
         CommsService();
@@ -162,8 +174,8 @@ namespace LFAST
             ALL_CONNECTED = 2,
         };
         virtual void sendMessage(CommsMessage &, uint8_t);
-        template <class T>
-        inline bool registerMessageHandler(const char *key, MessageHandler<T> fn);
+        template <class T, size_t N=1>
+        inline bool registerMessageHandler(const char *key, MessageHandler<T, N> fn);
         inline bool callMessageHandler(JsonPair kvp);
 
         virtual bool Status()
@@ -201,20 +213,21 @@ namespace LFAST
     //     return true;
     // }
 
-    template <class T>
-    bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<T> fn)
+    template < class T, size_t N>
+    bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<T, N> fn)
     {
         // TODO: Add exception handling
         return false;
     }
 
-    template <>
-    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<int> fn)
+    template <int, size_t N>
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<int, N> fn)
     {
         this->intHandlers[key] = fn;
         this->handlerTypes[key] = INT_HANDLER;
         return true;
     }
+
     template <>
     inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<unsigned int> fn)
     {
@@ -222,6 +235,7 @@ namespace LFAST
         this->handlerTypes[key] = UINT_HANDLER;
         return true;
     }
+
     template <>
     inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<double> fn)
     {
@@ -229,6 +243,7 @@ namespace LFAST
         this->handlerTypes[key] = DOUBLE_HANDLER;
         return true;
     }
+
     template <>
     inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<bool> fn)
     {
@@ -244,32 +259,34 @@ namespace LFAST
         this->handlerTypes[key] = STRING_HANDLER;
         return true;
     }
-    template <>
-    inline bool LFAST::CommsService::callMessageHandler(const char *key, int val)
+
+    template <int>
+    inline bool LFAST::CommsService::callMessageHandler(const char *key, JsonVariant val)
     {
         auto mh = this->intHandlers[key];
+        if (m)
         mh.call(val);
         return true;
     }
 
-    template <>
-    inline bool LFAST::CommsService::callMessageHandler(const char *key, unsigned int val)
+    template <unsigned int>
+    inline bool LFAST::CommsService::callMessageHandler(const char *key, JsonVariant val)
     {
         auto mh = this->uIntHandlers[key];
         mh.call(val);
         return true;
     }
 
-    template <>
-    inline bool LFAST::CommsService::callMessageHandler(const char *key, double val)
+    template <double*>
+    inline bool LFAST::CommsService::callMessageHandler(const char *key, JsonVariant val)
     {
         auto mh = this->doubleHandlers[key];
         mh.call(val);
         return true;
     }
 
-    template <>
-    inline bool LFAST::CommsService::callMessageHandler(const char *key, bool val)
+    template <bool>
+    inline bool LFAST::CommsService::callMessageHandler(const char *key, JsonVariant val)
     {
         auto mh = this->boolHandlers[key];
         mh.call(val);
@@ -341,12 +358,12 @@ namespace LFAST
     // }
 
     // template <typename T>
-    // inline void CommsMessage::addKeyValuePair(const char *  key, T val)
+    // inline void CommsMessage::addKeyValuePair(const char *  key, T *val)
     // {
     //     if (this->destKey.length() > 0)
-    //         JsonDoc[(this->destKey)][key] = val;
+    //         JsonDoc[(this->destKey)][key] = *val;
     //     else
-    //         JsonDoc[key] = val;
+    //         JsonDoc[key] = *val;
     // };
 
     template <typename T>
