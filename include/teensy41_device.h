@@ -19,11 +19,12 @@
 #define NUM_SERIAL_DEVICES 7
 #endif
 
-
+#if !defined(TERMINAL_ENABLED) && !defined(TERMINAL_DISABLED)
 #if defined(TEST_SERIAL_NO)
 #define TERMINAL_ENABLED
 #else
 #define TERMINAL_DISABLED
+#endif
 #endif
 
 #if defined(TERMINAL_ENABLED) && !defined(TEST_SERIAL_NO)

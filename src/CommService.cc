@@ -117,6 +117,7 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
     return true;
 }
 
+#if defined(TERMINAL_ENABLED)
 void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
 {
     if (debugCli != nullptr)
@@ -142,6 +143,7 @@ void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
         // Serial2.println("");
     }
 }
+#endif
 
 void LFAST::CommsService::processClientData(const char *destFilter = "")
 {
@@ -167,18 +169,20 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const char *destFilt
     //     cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, "processMessage()");
     if (msg->hasBeenProcessed())
     {
+#if defined(TERMINAL_ENABLED)
         if (cli != nullptr)
         {
             cli->printDebugMessage("Something went wrong processing messages.");
         }
+#endif
         return;
     }
-
+#if defined(TERMINAL_ENABLED)
     if (cli != nullptr)
     {
         cli->updatePersistentField(DeviceName, PROCESSED_MESSAGE_ROW, msg->jsonInputBuffer);
     }
-
+#endif
     DynamicJsonDocument &doc = msg->deserialize();
     JsonObject msgRoot = doc.as<JsonObject>();
 
@@ -252,26 +256,30 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
 void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 {
     static int callCount = 0;
-
+#if defined(TERMINAL_ENABLED)
     if (cli != nullptr)
         cli->updatePersistentField(DeviceName, COMMS_SERVICE_STATUS_ROW, callCount++);
-
+#endif
     if (sendOpt == ACTIVE_CONNECTION)
     {
         if (activeConnection == nullptr)
         {
+#if defined(TERMINAL_ENABLED)            
             if (cli != nullptr)
             {
-                cli->printDebugMessage("Error: Active connection is null", LFAST::ERROR);
+                cli->printDebugMessage("Error: Active connection is null", LFAST::ERROR_MESSAGE);
             }
+#endif
             return;
         }
+#if defined(TERMINAL_ENABLED)
         if (cli != nullptr)
         {
             char msgBuff[JSON_PROGMEM_SIZE]{0};
             msg.getMessageStr(msgBuff);
             cli->updatePersistentField(DeviceName, MESSAGE_SENT_ROW, msgBuff);
         }
+#endif
         if (activeConnection->client)
         {
 #define USE_BUFFERED_CLIENT 1
@@ -291,18 +299,25 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     }
     else
     {
+#if defined(TERMINAL_ENABLED)
         if (cli != nullptr)
         {
             cli->printDebugMessage("Not yet implemented (something went wrong).");
         }
+#endif
     }
 }
 
+#if defined(TERMINAL_ENABLED)
 DynamicJsonDocument &LFAST::CommsMessage::deserialize(TerminalInterface *debugCli)
+#else
+DynamicJsonDocument &LFAST::CommsMessage::deserialize()
+#endif
 {
     if (this->jsonInputBuffer != nullptr)
     {
         DeserializationError error = deserializeJson(this->JsonDoc, this->jsonInputBuffer);
+#if defined(TERMINAL_ENABLED)
         if (error)
         {
             if (debugCli != nullptr)
@@ -310,10 +325,13 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize(TerminalInterface *debugCl
                 debugCli->printfDebugMessage("deserializeJson() failed: %s", error.c_str());
             }
         }
+#endif
     }
     else
     {
+#if defined(TERMINAL_ENABLED)
         debugCli->printfDebugMessage("jsonInputBuffer nullptr error");
+#endif
         while (1) {;}
     }
     return this->JsonDoc;
@@ -345,7 +363,7 @@ void LFAST::CommsService::stopDisconnectedClients()
         }
     }
 }
-
+#if defined(TERMINAL_ENABLED)
 void LFAST::CommsService::setupPersistentFields()
 {
     if (cli == nullptr)
@@ -358,7 +376,7 @@ void LFAST::CommsService::setupPersistentFields()
 
     cli->addPersistentField(this->DeviceName, "[TX]", MESSAGE_SENT_ROW);
 }
-
+#endif
 // void LFAST::CommsService::updateStatusFields()
 // {
 //     cli->updatePersistentField(COMMS_SERVICE_STATUS_ROW, "Status not set up yet");
