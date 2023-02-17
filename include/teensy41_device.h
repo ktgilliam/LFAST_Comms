@@ -136,3 +136,5 @@
 void configureWatchdog();
 void watchdogWarning();
 void feedWatchDog();
+
+bool checkForCrashReport();
