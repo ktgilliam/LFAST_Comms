@@ -133,3 +133,6 @@
 #define CLEAR_DEBUG_PIN() digitalWrite(DEBUG_PIN_1, 0);
 #define TOGGLE_LED_PIN() digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 
+void configureWatchdog();
+void watchdogWarning();
+void feedWatchDog();

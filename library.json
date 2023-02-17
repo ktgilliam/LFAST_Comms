@@ -2,7 +2,7 @@
 	"name": "LFAST_Device",
 	"version": "1.0.0",
 	"description": "Suite of tools used by the Teensy microcontrollers in the LFAST system",
-	"keywords": "JSON,Ethernet,Teensy",
+	"keywords": "JSON,Ethernet,Teensy,Watchdog",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ktgilliam/LFAST_Device.git"
@@ -25,6 +25,11 @@
 			"owner": "bblanchon",
 			"name": "ArduinoJson",
 			"version": "^6.19.4"
+		},
+		{
+			"owner": "tonton81",
+			"name": "WDT_T4",
+			"version": "https://github.com/tonton81/WDT_T4.git"
 		}
 	],
 	"frameworks": "arduino",
