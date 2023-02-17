@@ -27,6 +27,7 @@
 
 namespace LFAST
 {
+    /// @brief Effects the color the message prints in.
     enum
     {
         INFO_MESSAGE = 0,
@@ -83,9 +84,7 @@ public:
     TerminalInterface(const std::string &, HardwareSerial *, uint32_t);
 
     void registerDevice(const std::string &);
-    // void updateStatusFields(MountControl &);
     void serviceCLI();
-    // void printDebugMessage(std::string&, uint8_t);
     template <typename... Args>
     void printfDebugMessage(const char *fmt, Args... args);
     void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO_MESSAGE);
@@ -123,6 +122,9 @@ public:
     // void printDebugInfo();
 };
 
+/// @brief Print a debug message using printf-style formatting
+/// @param fmt Format string
+/// @param args Values to print in the formatted string
 template <typename... Args>
 void TerminalInterface::printfDebugMessage(const char *fmt, Args... args)
 {
