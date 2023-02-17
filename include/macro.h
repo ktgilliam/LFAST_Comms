@@ -11,3 +11,6 @@
 #define CONCAT(A, B) CONCAT_(A, B)
 
 #define EVAL(M) M
+
+#define xstr(s) str(s)
+#define str(s) #s

@@ -11,6 +11,10 @@
 #include "macro.h"
 #include <Arduino.h>
 
+#ifdef DEVICE_LABEL
+#define DEVICE_CLI_LABEL str(DEVICE_LABEL)
+#endif
+
 #define SERIAL_CH(N) CONCAT(Serial, N)
 
 #if defined(ARDUINO_TEENSY41)
