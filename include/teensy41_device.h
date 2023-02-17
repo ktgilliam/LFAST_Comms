@@ -12,7 +12,7 @@
 #include <Arduino.h>
 
 #ifdef DEVICE_LABEL
-#define DEVICE_CLI_LABEL str(DEVICE_LABEL)
+#define DEVICE_CLI_LABEL STR(DEVICE_LABEL)
 #endif
 
 #define SERIAL_CH(N) CONCAT(Serial, N)
