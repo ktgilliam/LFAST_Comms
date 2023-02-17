@@ -1,5 +1,26 @@
-#pragma once
+/*******************************************************************************
+Copyright 2022
+Steward Observatory Engineering & Technical Services, University of Arizona
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+*******************************************************************************/
+///
+/// @author Kevin Gilliam
+/// @date February 16th, 2023
+/// @file TerminalInterface.h
+///
+/// The terminal interface uses a teensy serial port to display data and report
+/// messages in an organized way. 
+/// - To set which port, edit the TEST_SERIAL_NO field in platformio.ini
+/// - To set the baud rate, edit the TEST_SERIAL_BAUD in platformio.ini
 
+#pragma once
 #include <Arduino.h>
 #include <cinttypes>
 #include <deque>
@@ -27,6 +48,7 @@
 
 namespace LFAST
 {
+    /// @brief Effects the color the message prints in.
     enum
     {
         INFO_MESSAGE = 0,
@@ -83,9 +105,7 @@ public:
     TerminalInterface(const std::string &, HardwareSerial *, uint32_t);
 
     void registerDevice(const std::string &);
-    // void updateStatusFields(MountControl &);
     void serviceCLI();
-    // void printDebugMessage(std::string&, uint8_t);
     template <typename... Args>
     void printfDebugMessage(const char *fmt, Args... args);
     void printDebugMessage(const std::string &msg, uint8_t level = LFAST::INFO_MESSAGE);
@@ -123,6 +143,9 @@ public:
     // void printDebugInfo();
 };
 
+/// @brief Print a debug message using printf-style formatting
+/// @param fmt Format string
+/// @param args Values to print in the formatted string
 template <typename... Args>
 void TerminalInterface::printfDebugMessage(const char *fmt, Args... args)
 {

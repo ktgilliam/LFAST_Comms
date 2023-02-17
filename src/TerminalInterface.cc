@@ -1,3 +1,21 @@
+/*******************************************************************************
+Copyright 2022
+Steward Observatory Engineering & Technical Services, University of Arizona
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+*******************************************************************************/
+
+/// 
+/// @author Kevin Gilliam
+/// @date February 16th, 2023
+/// @file TerminalInterface.cc
+///
 
 #include <TerminalInterface.h>
 
@@ -29,6 +47,8 @@ TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *
     highestFieldRowNum = 0;
 };
 
+/// @brief Add a new LFAST_Device's ID string to the device table
+/// @param devStr Device's identifying string
 void TerminalInterface::registerDevice(const std::string &devStr)
 {
     std::pair<std::string, uint8_t> devMap;
@@ -61,7 +81,6 @@ void TerminalInterface::printHeader()
 
 void TerminalInterface::resetPrompt()
 {
-
     messageRow = promptRow + 2;
     cursorToRowCol(messageRow, 0);
     std::string DEBUG_BORDER_STR = std::string(TERMINAL_WIDTH, '-');
@@ -107,23 +126,22 @@ void TerminalInterface::serviceCLI()
                 currentInputCol++;
             }
         }
-        // cnt = 0;
     }
-    // else
-    // {
-    // serial->printf("%d", cnt++);
-    // }
 }
+
 
 void TerminalInterface::handleCliCommand()
 {
     cursorToRow(promptRow + 1);
     clearToEndOfRow();
     serial->printf("%s: Command Not Found.\r\n", rxBuff);
-
     resetPrompt();
 }
 
+/// @brief Add a persistent field label to the terminal
+/// @param device String identifying LFAST_Device adding the label
+/// @param label String label
+/// @param printRow The row the device wants to print the label on
 void TerminalInterface::addPersistentField(const std::string &device, const std::string &label, uint8_t printRow)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
@@ -149,29 +167,30 @@ void TerminalInterface::addPersistentField(const std::string &device, const std:
     persistentFields.push_back(field);
     // resetPrompt();
 }
-// void TerminalInterface::printDebugInfo()
-// {
-//     TEST_SERIAL.printf("highest field row:%d\r\n", highestFieldRowNum);
-// }
 
+
+
+/// @brief Print persistent field labels
+///
+/// The terminal's persistent fields are set up to print out values which update 
+/// frequently to the same position in the console window, rather than printing out
+/// an endlessly scrolling list of values.
 void TerminalInterface::printPersistentFieldLabels()
 {
     // TEST_SERIAL.printf("Num fields:%d\r\n", persistentFields.size());
-
     for (auto field : persistentFields)
     {
         cursorToRow(field->printRow);
         clearToEndOfRow();
         serial->printf("\033[0K\033[37m%s:\033[22G", field->label.c_str());
     }
-
-    // cursorToRowCol(DEBUG_BORDER_1, 0);
-    // std::string DEBUG_BORDER_STR = std::string(TERMINAL_WIDTH, '-');
-    // serial->printf("%s", DEBUG_BORDER_STR.c_str());
-
     resetPrompt();
 }
 
+/// @brief Prints a new value for a persistent field
+/// @param device String identifying LFAST_Device adding the label
+/// @param printRow The row the device wants to print the label on
+/// @param fieldVal value to print
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, int fieldVal)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
@@ -185,6 +204,10 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     interrupts();
 }
 
+/// @brief Prints a new value for a persistent field
+/// @param device String identifying LFAST_Device adding the label
+/// @param printRow The row the device wants to print the label on
+/// @param fieldVal value to print
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, long fieldVal)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
@@ -197,6 +220,11 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     clearToEndOfRow();
     interrupts();
 }
+
+/// @brief Prints a new value for a persistent field
+/// @param device String identifying LFAST_Device adding the label
+/// @param printRow The row the device wants to print the label on
+/// @param fieldVal value to print
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, double fieldVal, const char *fmt)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
@@ -210,6 +238,11 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     interrupts();
 }
 
+
+/// @brief Prints a new value for a persistent field
+/// @param device String identifying LFAST_Device adding the label
+/// @param printRow The row the device wants to print the label on
+/// @param fieldVal value to print
 void TerminalInterface::updatePersistentField(const std::string &device, uint8_t printRow, const std::string &fieldValStr)
 {
     uint8_t deviceRowOffs = senderRowOffsetMap[device];
@@ -230,6 +263,9 @@ void TerminalInterface::updatePersistentField(const std::string &device, uint8_t
     interrupts();
 }
 
+/// @brief Prints a debug message to the terminal
+/// @param msg Message string
+/// @param level 0-4 to determine severity (coloring)
 void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
 {
 
@@ -237,9 +273,6 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
     std::string colorStr;
     switch (level)
     {
-    case LFAST::INFO_MESSAGE:
-        colorStr = WHITE;
-        break;
     case LFAST::DEBUG_MESSAGE:
         colorStr = GREEN;
         break;
@@ -248,6 +281,10 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
         break;
     case LFAST::ERROR_MESSAGE:
         colorStr = RED;
+        break;
+    default:
+    case LFAST::INFO_MESSAGE:
+        colorStr = WHITE;
         break;
     }
     std::stringstream ss;
