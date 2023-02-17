@@ -12,5 +12,13 @@
 
 #define EVAL(M) M
 
-#define xstr(s) str(s)
-#define str(s) #s
+
+#if defined (STR)
+#undef STR
+#endif
+#define STR(s) #s
+
+#if defined (XSTR)
+#undef XSTR
+#endif
+#define XSTR(s) STR(s)
