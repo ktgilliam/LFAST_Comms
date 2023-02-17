@@ -5,7 +5,7 @@
 	"keywords": "JSON,Ethernet,Teensy",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:ktgilliam/LFAST_Device.git"
+		"url": "https://github.com/ktgilliam/LFAST_Device.git"
 	},
 	"authors": {
 		"name": "Kevin Gilliam",
@@ -14,7 +14,7 @@
 
 	"dependencies": [{
 			"name": "NativeEthernet",
-			"version": "git@github.com:vjmuzik/NativeEthernet.git"
+			"version": "https://github.com/vjmuzik/NativeEthernet.git"
 		},
 		{
 			"owner": "bblanchon",
