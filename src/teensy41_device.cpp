@@ -9,7 +9,7 @@ void watchdogWarning()
 {
     if (cli != nullptr)
     {
-        cli->printDebugMessage("Danger - feed the dog!", LFAST::WARNING_MESSAGE);
+        TEST_SERIAL.print("\033[31mDanger - feed the dog!\033[37m");
     }
 }
 
