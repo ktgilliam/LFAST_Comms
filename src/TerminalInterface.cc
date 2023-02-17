@@ -11,13 +11,11 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see <https://www.gnu.org/licenses/>.
 *******************************************************************************/
 
- /// 
- ///  @ Author: Kevin Gilliam
- ///  @ Create Time: 2022-09-07 08:34:54
- ///  @ Modified by: Kevin Gilliam
- ///  @ Modified time: 2022-09-08 12:39:33
- ///  @ Description:
- ///
+/// 
+/// @author Kevin Gilliam
+/// @date February 16th, 2023
+/// @file TerminalInterface.cc
+///
 
 #include <TerminalInterface.h>
 

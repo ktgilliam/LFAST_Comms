@@ -1,9 +1,19 @@
+/*******************************************************************************
+Copyright 2022
+Steward Observatory Engineering & Technical Services, University of Arizona
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+*******************************************************************************/
 ///
-///  @ Author: Kevin Gilliam
-///  @ Create Time: 2022-09-07 15:54:35
-///  @ Modified by: Kevin Gilliam
-///  @ Modified time: 2022-09-08 12:53:34
-///  @ Description:
+/// @author Kevin Gilliam
+/// @date February 16th, 2023
+/// @file TcpCommsService.cc
 ///
 
 #include "../include/TcpCommsService.h"
