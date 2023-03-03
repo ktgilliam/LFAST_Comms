@@ -13,9 +13,9 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 ///
 /// @author Kevin Gilliam
 /// @date February 16th, 2023
-/// @file TcpCommsService.h
+/// @file UdpCommsService.h
 ///
-/// The LFAST Comms library (of which TcpCommsService is a component)
+/// The LFAST Comms library (of which UdpCommsService is a component)
 /// works by associating JSON key-value pairs to function pointers.
 /// When a key is received, the library checks to see if a function 
 /// pointer has been registered for it. If it has, it calls that function
@@ -35,29 +35,29 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <Ethernet.h>
 #endif
 
+#include <EthernetUdp.h>
 #include "CommService.h"
 
 
 #define MAX_CLIENTS 4
 namespace LFAST
 {
-    class TcpCommsService : public CommsService
+    class UdpCommsService : public CommsService
     {
     protected:
     static bool hardwareConfigurationDone;
         void getTeensyMacAddr(uint8_t *mac);
         static byte mac[6];
         IPAddress ip;
-        EthernetServer *tcpServer;
+        EthernetUDP *udp;
 
         std::list<EthernetClient> enetClients;
     public:
-        TcpCommsService();
-        TcpCommsService(byte *);
+        UdpCommsService();
+        UdpCommsService(byte *);
 
         bool initializeEnetIface(uint16_t);
 
         bool Status() { return this->commsServiceStatus; };
-        bool checkForNewClients() override;
     };
 }
