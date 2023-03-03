@@ -250,6 +250,11 @@ bool LFAST::CommsService::callMessageHandler(JsonPair kvp)
             this->callMessageHandler<unsigned int>(keyStr, val);
         }
         break;
+        case FLOAT_HANDLER:
+        {
+            auto val = kvp.value().as<float>();
+            this->callMessageHandler<float>(keyStr, val);
+        }
         case DOUBLE_HANDLER:
         {
             auto val = kvp.value().as<double>();
