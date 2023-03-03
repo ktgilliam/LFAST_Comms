@@ -9,8 +9,10 @@
 #include <Ethernet.h>
 #endif
 
-#include "CommService.h"
+#include "CommsService.h"
 
+namespace LFAST
+{
 class IpCommsService : public CommsService
 {
 protected:
@@ -23,3 +25,4 @@ public:
     bool initializeEnetIface(uint16_t);
     bool Status() { return this->commsServiceStatus; };
 };
+}

@@ -35,7 +35,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <Ethernet.h>
 #endif
 
-#include "CommService.h"
+#include "IpCommsService.h"
 
 
 #define MAX_CLIENTS 4
@@ -53,5 +53,6 @@ namespace LFAST
 
         bool Status() { return this->commsServiceStatus; };
         bool checkForNewClients() override;
+        bool initializeEnetIface(uint16_t) override;
     };
 }

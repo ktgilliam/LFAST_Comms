@@ -60,7 +60,7 @@ LFAST::TcpCommsService::TcpCommsService()
 
 bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
 {
-    self->IpCommsService.initializeEnetIface(_port);
+    IpCommsService::initializeEnetIface(_port);
     tcpServer = new EthernetServer(_port);
 
     return commsServiceStatus;

@@ -16,7 +16,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 /// @file CommService.cc
 ///
 
-#include "../include/CommService.h"
+#include "../include/CommsService.h"
 
 #include <Arduino.h>
 #include <array>
