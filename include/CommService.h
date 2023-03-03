@@ -167,6 +167,7 @@ namespace LFAST
         {
             INT_HANDLER,
             UINT_HANDLER,
+            FLOAT_HANDLER,
             DOUBLE_HANDLER,
             BOOL_HANDLER,
             STRING_HANDLER
@@ -174,6 +175,7 @@ namespace LFAST
         std::unordered_map<std::string, HandlerType> handlerTypes;
         std::unordered_map<std::string, MessageHandler<int>> intHandlers;
         std::unordered_map<std::string, MessageHandler<unsigned int>> uIntHandlers;
+        std::unordered_map<std::string, MessageHandler<float>> floatHandlers;
         std::unordered_map<std::string, MessageHandler<double>> doubleHandlers;
         std::unordered_map<std::string, MessageHandler<bool>> boolHandlers;
         // std::unordered_map<std::string, MessageHandler<std::string>> stringHandlers;
@@ -254,6 +256,13 @@ namespace LFAST
         return true;
     }
     template <>
+    inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<float> fn)
+    {
+        this->floatHandlers[key] = fn;
+        this->handlerTypes[key] = FLOAT_HANDLER;
+        return true;
+    }
+    template <>
     inline bool LFAST::CommsService::registerMessageHandler(const char *key, MessageHandler<double> fn)
     {
         this->doubleHandlers[key] = fn;
@@ -287,6 +296,14 @@ namespace LFAST
     inline bool LFAST::CommsService::callMessageHandler(const char *key, unsigned int val)
     {
         auto mh = this->uIntHandlers[key];
+        mh.call(val);
+        return true;
+    }
+
+    template <>
+    inline bool LFAST::CommsService::callMessageHandler(const char *key, float val)
+    {
+        auto mh = this->floatHandlers[key];
         mh.call(val);
         return true;
     }
