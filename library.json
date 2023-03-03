@@ -1,6 +1,6 @@
 {
 	"name": "LFAST_Device",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "Suite of tools used by the Teensy microcontrollers in the LFAST system",
 	"keywords": "JSON,Ethernet,Teensy,Watchdog",
 	"repository": {
