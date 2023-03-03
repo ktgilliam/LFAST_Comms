@@ -39,24 +39,12 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <iterator>
 // #include <regex>
 
-// Initialize the Ethernet server library
-// with the IP address and port you want to use
-
-void getTeensyMacAddr(uint8_t *mac);
-IPAddress parseIpAddress(byte *bytes);
-
-bool LFAST::UdpCommsService::hardwareConfigurationDone = false;
-// const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
-// const uint16_t defaultPort = DEFAULT_PORT;
-
-byte LFAST::UdpCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 LFAST::UdpCommsService::UdpCommsService(byte *ipBytes)
+: IpCommsService(byte *ipBytes)
 {
-    ip = IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]);
 }
 
 LFAST::UdpCommsService::UdpCommsService()
@@ -66,29 +54,10 @@ LFAST::UdpCommsService::UdpCommsService()
 
 bool LFAST::UdpCommsService::initializeEnetIface(uint16_t _port)
 {
-    bool initResult = true;
-    tcpServer = new EthernetServer(_port);
-
-    if (!hardwareConfigurationDone)
-    {
-        getTeensyMacAddr(mac);
-        // initialize the Ethernet device
-        Ethernet.begin(mac, ip);
-        // Ethernet.begin(mac, ip, myDns, gateway, subnet)
-
-        // Check for Ethernet hardware present
-        if (Ethernet.hardwareStatus() == EthernetNoHardware)
-        {
-            #if defined(TERMINAL_ENABLED)
-            if (cli != nullptr)
-                cli->printfDebugMessage("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
-                #endif
-            initResult = false;
-        }
-        hardwareConfigurationDone = true;
-    }
-    if (initResult)
-        commsServiceStatus = true;
+    udp = new EthernetUDP();
+    IpCommsService::initializeEnetIface(_port);
+      // start UDP
+    udp.begin(_port);
     return commsServiceStatus;
 }
 

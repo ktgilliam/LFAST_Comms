@@ -36,7 +36,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #endif
 
 #include <EthernetUdp.h>
-#include "CommService.h"
+#include "IpCommsService.h"
 
 
 #define MAX_CLIENTS 4
@@ -55,7 +55,7 @@ namespace LFAST
         UdpCommsService();
         UdpCommsService(byte *);
 
-        bool initializeEnetIface(uint16_t);
+        bool initializeEnetIface(uint16_t) override;
 
         bool Status() { return this->commsServiceStatus; };
     };

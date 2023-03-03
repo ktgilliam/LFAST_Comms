@@ -22,7 +22,7 @@ protected:
     void getTeensyMacAddr(uint8_t *mac);
 
 public: 
-    bool initializeEnetIface(uint16_t);
+    virtual bool initializeEnetIface(uint16_t);
     bool Status() { return this->commsServiceStatus; };
 };
 }

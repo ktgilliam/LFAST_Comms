@@ -49,8 +49,8 @@ void stopDisconnectedClients();
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 LFAST::TcpCommsService::TcpCommsService(byte *ipBytes)
+: IpCommsService(byte *ipBytes)
 {
-    ip = IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]);
 }
 
 LFAST::TcpCommsService::TcpCommsService()
@@ -60,9 +60,8 @@ LFAST::TcpCommsService::TcpCommsService()
 
 bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
 {
-    IpCommsService::initializeEnetIface(_port);
     tcpServer = new EthernetServer(_port);
-
+    IpCommsService::initializeEnetIface(_port);
     return commsServiceStatus;
 }
 

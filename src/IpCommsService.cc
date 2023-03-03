@@ -20,7 +20,7 @@ void LFAST::IpCommsService::getTeensyMacAddr(uint8_t *mac)
 bool LFAST::IpCommsService::initializeEnetIface(uint16_t _port)
 {
     bool initResult = true;
-
+    port = _port;
 
     if (!hardwareConfigurationDone)
     {
@@ -37,6 +37,11 @@ bool LFAST::IpCommsService::initializeEnetIface(uint16_t _port)
                 cli->printfDebugMessage("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
                 #endif
             initResult = false;
+        }
+
+        if (Ethernet.linkStatus() == LinkOFF) 
+        {
+            cli->printfDebugMessage("Ethernet cable is not connected.");
         }
         hardwareConfigurationDone = true;
     }
