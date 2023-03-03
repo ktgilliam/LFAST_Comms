@@ -43,7 +43,7 @@
 	"headers": [
 		"LFAST_Device.h",
 		"math_util.h",
-		"CommService.h",
+		"CommsService.h",
 		"TcpCommsService.h",
 		"UdpCommsService.h",
 		"BitFieldUtil.h",

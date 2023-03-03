@@ -13,7 +13,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 ///
 /// @author Kevin Gilliam
 /// @date February 16th, 2023
-/// @file TcpCommsService.cc
+/// @file UdpCommsService.cc
 ///
 
 #include "../include/UdpCommsService.h"
@@ -42,30 +42,29 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 // Initialize the Ethernet server library
 // with the IP address and port you want to use
 
-void stopDisconnectedClients();
 void getTeensyMacAddr(uint8_t *mac);
 IPAddress parseIpAddress(byte *bytes);
 
-bool LFAST::TcpCommsService::hardwareConfigurationDone = false;
+bool LFAST::UdpCommsService::hardwareConfigurationDone = false;
 // const IPAddress defaultIp = IPAddress(192, 168, 121, 177);
 // const uint16_t defaultPort = DEFAULT_PORT;
 
-byte LFAST::TcpCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte LFAST::UdpCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-LFAST::TcpCommsService::TcpCommsService(byte *ipBytes)
+LFAST::UdpCommsService::UdpCommsService(byte *ipBytes)
 {
     ip = IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]);
 }
 
-LFAST::TcpCommsService::TcpCommsService()
+LFAST::UdpCommsService::UdpCommsService()
 {
     ip = IPAddress(0, 0, 0, 0);
 }
 
-bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
+bool LFAST::UdpCommsService::initializeEnetIface(uint16_t _port)
 {
     bool initResult = true;
     tcpServer = new EthernetServer(_port);
@@ -93,31 +92,12 @@ bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
     return commsServiceStatus;
 }
 
-bool LFAST::TcpCommsService::checkForNewClients()
-{
-    bool newClientFlag = false;
-    // check for any new client connecting, and say hello (before any incoming data)
-    EthernetClient newClient = tcpServer->accept();
-    if (newClient)
-    {
-        newClientFlag = true;
-        #if defined(TERMINAL_ENABLED)
-        if (cli != nullptr)
-            cli->printfDebugMessage("Connection # %d Made.\r\n", connections.size() + 1);
-            #endif
-        // Once we "accept", the client is no longer tracked by EthernetServer
-        // so we must store it into our list of clients
-        enetClients.push_back(newClient);
-        setupClientMessageBuffers(&enetClients.back());
-    }
-    return (newClientFlag);
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// LOCAL/PRIVATE FUNCTIONS ////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void LFAST::TcpCommsService::getTeensyMacAddr(uint8_t *mac)
+void LFAST::UdpCommsService::getTeensyMacAddr(uint8_t *mac)
 {
     for (uint8_t by = 0; by < 2; by++)
         mac[by] = (HW_OCOTP_MAC1 >> ((1 - by) * 8)) & 0xFF;

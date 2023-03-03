@@ -16,3 +16,31 @@ void LFAST::IpCommsService::getTeensyMacAddr(uint8_t *mac)
     for (uint8_t by = 0; by < 4; by++)
         mac[by + 2] = (HW_OCOTP_MAC0 >> ((3 - by) * 8)) & 0xFF;
 }
+
+bool LFAST::IpCommsService::initializeEnetIface(uint16_t _port)
+{
+    bool initResult = true;
+
+
+    if (!hardwareConfigurationDone)
+    {
+        getTeensyMacAddr(mac);
+        // initialize the Ethernet device
+        Ethernet.begin(mac, ip);
+        // Ethernet.begin(mac, ip, myDns, gateway, subnet)
+
+        // Check for Ethernet hardware present
+        if (Ethernet.hardwareStatus() == EthernetNoHardware)
+        {
+            #if defined(TERMINAL_ENABLED)
+            if (cli != nullptr)
+                cli->printfDebugMessage("Ethernet PHY was not found.  Sorry, can't run without hardware. :(");
+                #endif
+            initResult = false;
+        }
+        hardwareConfigurationDone = true;
+    }
+    if (initResult)
+        commsServiceStatus = true;
+    return commsServiceStatus;
+}

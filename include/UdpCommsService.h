@@ -51,7 +51,6 @@ namespace LFAST
         IPAddress ip;
         EthernetUDP *udp;
 
-        std::list<EthernetClient> enetClients;
     public:
         UdpCommsService();
         UdpCommsService(byte *);
