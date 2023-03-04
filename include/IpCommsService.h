@@ -20,7 +20,7 @@ protected:
     static byte mac[6];
     IPAddress ip;
     void getTeensyMacAddr(uint8_t *mac);
-
+    uint16_t port;
 public: 
     virtual bool initializeEnetIface(uint16_t);
     bool Status() { return this->commsServiceStatus; };
