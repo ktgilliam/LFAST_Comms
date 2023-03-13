@@ -113,27 +113,28 @@ namespace LFAST
         std::string destKey;
     };
 
-    template <class T>
+
+    template <typename... Types>
     struct MessageHandler
     {
-        void (*MsgHandlerFn)(T);
+        void (*MsgHandlerFn)(Types... args);
 
         MessageHandler()
         {
             this->MsgHandlerFn = nullptr;
         }
 
-        MessageHandler(void (*ptr)(T))
+        MessageHandler(void (*ptr)(Types... args))
         {
             this->MsgHandlerFn = ptr;
         }
         virtual ~MessageHandler(){};
 
-        bool call(T val)
+        bool call(Types... vals)
         {
             if (this->MsgHandlerFn)
             {
-                MsgHandlerFn(val);
+                MsgHandlerFn(&vals...);
                 return true;
             }
             return false;
