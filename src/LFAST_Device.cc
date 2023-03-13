@@ -20,6 +20,28 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <cstring>
 #include <cstdio>
 // #include "teensy41_device.h"
+#include <iterator>
+
+void LFAST_Device::DeviceControl_ISR()
+{
+    noInterrupts();
+    for (auto &fn : isr_fn_list)
+    {
+        fn();
+    }
+    interrupts();
+}
+void LFAST_Device::registerIsrFunction(void (*)() fn, int idx)
+{
+    if (idx == -1)
+        isr_fn_list.push_back(fn);
+    else
+    {
+        auto itr = isr_fn_list.begin();
+        std::advance(itr, idx);
+        isr_fn_list.insert(itr, fn);
+    }
+}
 
 #if defined(TERMINAL_ENABLED)
 TerminalInterface *LFAST_Device::cli = nullptr;

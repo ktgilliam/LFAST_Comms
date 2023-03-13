@@ -20,16 +20,21 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <teensy41_device.h>
 
+#include <vector>
+
 #if defined(TERMINAL_ENABLED)
 #include <TerminalInterface.h>
 #endif
 
 #define LFAST_DEVICE
 
+
 class LFAST_Device
 {
 private:
     bool deviceNamed;
+    void DeviceControl_ISR();
+    std::vector<void (*)()> isr_fn_list;
 
 protected:
     char DeviceName[30];
@@ -44,5 +49,7 @@ public:
     virtual void connectTerminalInterface(TerminalInterface *_cli, const char *dev);
     virtual void serviceCLI(){};
 #endif
+    void registerIsrFunction(void (*)() fn, int index=-1);
+
 
 };
