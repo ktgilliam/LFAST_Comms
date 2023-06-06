@@ -7,12 +7,13 @@
 
 // https://arduinojson.org/v6/example/config/
 
-void SdConfigFileReader::loadConfiguration(const char* fileName)
+bool SdConfigFileReader::loadConfiguration(const char* fileName)
 {
+    bool success = true;
     // Serial.print("Initializing SD card...");
     if (!SD.begin(BUILTIN_SDCARD))
     {
-        // Something went wrong
+        success = false;
     }
 
     // open the file. note that only one file can be open at a time,
@@ -34,9 +35,11 @@ void SdConfigFileReader::loadConfiguration(const char* fileName)
     }
     else
     {
+        success = false;
         // if the file didn't open, print an error:
         // TEST_SERIAL.println("error opening test.txt");
     }
+    return success;
 }
 
 // Prints the content of a file to the Serial
