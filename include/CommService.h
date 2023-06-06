@@ -17,7 +17,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 ///
 /// The LFAST Comms library (of which TcpCommsService is a component)
 /// works by associating JSON key-value pairs to function pointers.
-/// When a key is received, the library checks to see if a function 
+/// When a key is received, the library checks to see if a function
 /// pointer has been registered for it. If it has, it calls that function
 /// and passes the value from the key-value pair as an argument.
 /// This template defines and registers two such callbacks in this file.
@@ -64,11 +64,15 @@ namespace LFAST
     class CommsMessage
     {
     public:
-        CommsMessage()
-            : JsonDoc(DynamicJsonDocument(JSON_PROGMEM_SIZE))
+        CommsMessage(bool isArray = false)
+            : JsonDoc(DynamicJsonDocument(JSON_PROGMEM_SIZE)), msgIsArray(isArray)
         {
             std::memset(this->jsonInputBuffer, 0, sizeof(this->jsonInputBuffer));
             processed = false;
+            if (isArray)
+            {
+                array = JsonDoc.to<JsonArray>();
+            }
         }
         virtual ~CommsMessage() {}
         virtual void placeholder() {}
@@ -81,16 +85,19 @@ namespace LFAST
 #if defined(TERMINAL_ENABLED)
         DynamicJsonDocument &deserialize(TerminalInterface *debugCli = nullptr);
 #else
-    DynamicJsonDocument &deserialize();
+        DynamicJsonDocument &deserialize();
 #endif
         template <typename T>
         inline T getValue(const char *key);
 
         template <typename T>
         inline void addKeyValuePair(const char *key, T val);
+        inline void addKeyValuePairToArray(const char *key, T val);
         // inline void addKeyValuePair(const char *  key, T val);
         inline void addDestinationKey(const char *key){};
-
+        // void startArray();
+        // void endArray();
+        // void convertToArray();
         const char *getBuffPtr()
         {
             return jsonInputBuffer;
@@ -104,12 +111,16 @@ namespace LFAST
         {
             return processed;
         }
+
 #if defined(TERMINAL_ENABLED)
         void printMessageInfo(TerminalInterface *debugCli = nullptr);
 #endif
+
     protected:
         DynamicJsonDocument JsonDoc;
         bool processed;
+        bool msgIsArray;
+        JsonArray array;
         std::string destKey;
     };
 
@@ -159,7 +170,7 @@ namespace LFAST
         ClientConnection *activeConnection;
         bool commsServiceStatus;
 
-        #if defined(TERMINAL_ENABLED)
+#if defined(TERMINAL_ENABLED)
         virtual void setupPersistentFields() override;
 #endif
     private:
@@ -400,22 +411,27 @@ namespace LFAST
     template <typename T>
     inline void CommsMessage::addKeyValuePair(const char *key, T val)
     {
-        {
-            if (this->destKey.length() > 0)
-                JsonDoc[(this->destKey)][(key)] = val;
-            else
-                JsonDoc[(key)] = val;
-        };
+        if (this->destKey.length() > 0)
+            JsonDoc[(this->destKey)][(key)] = val;
+        else
+            JsonDoc[(key)] = val;
     }
 
-    template <>
-    inline void LFAST::CommsMessage::addKeyValuePair(const char *key, const char *val)
+    template <typename T>
+    inline void CommsMessage::addKeyValuePairToArray(const char *key, T val)
     {
+        if (msgIsArray)
         {
-            if (this->destKey.length() > 0)
-                JsonDoc[(this->destKey)][(key)] = val;
-            else
-                JsonDoc[(key)] = val;
-        };
+            JsonObject nested = array.createNestedObject();
+            nested[(key)] = val;
+        }
     }
+    // template <>
+    // inline void LFAST::CommsMessage::addKeyValuePair(const char *key, const char *val)
+    // {
+    //     if (this->destKey.length() > 0)
+    //         JsonDoc[(this->destKey)][(key)] = val;
+    //     else
+    //         JsonDoc[(key)] = val;
+    // }
 };

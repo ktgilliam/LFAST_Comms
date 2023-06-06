@@ -46,24 +46,24 @@ void LFAST::CommsService::setupClientMessageBuffers(Client *client)
 
 void LFAST::CommsService::defaultMessageHandler(const char *info)
 {
-    #if defined(TERMINAL_ENABLED)
+#if defined(TERMINAL_ENABLED)
     if (cli != nullptr)
     {
         cli->printfDebugMessage("Unregistered Message: [%s].\r\n", info);
     }
-    #endif
+#endif
 }
 
 void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
 {
-    #if defined(TERMINAL_ENABLED)
+#if defined(TERMINAL_ENABLED)
     if (cli != nullptr)
     {
         char msgBuff[JSON_PROGMEM_SIZE]{0};
         msg.getMessageStr(msgBuff);
         cli->printfDebugMessage("Invalid Message: %s", msgBuff);
     }
-    #endif
+#endif
 }
 
 bool LFAST::CommsService::checkForNewClients()
@@ -125,12 +125,12 @@ bool LFAST::CommsService::getNewMessages(ClientConnection &connection)
                 if (objectDone)
                 {
                     newMsg->jsonInputBuffer[bytesRead + 1] = '\0';
-                    #if defined(TERMINAL_ENABLED)
+#if defined(TERMINAL_ENABLED)
                     if (cli != nullptr)
                     {
                         cli->updatePersistentField(DeviceName, RAW_MESSAGE_RECEIVED_ROW, newMsg->jsonInputBuffer);
                     }
-                    #endif
+#endif
                     connection.rxMessageQueue.push_back(newMsg);
                     break;
                 }
@@ -292,7 +292,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
     {
         if (activeConnection == nullptr)
         {
-#if defined(TERMINAL_ENABLED)            
+#if defined(TERMINAL_ENABLED)
             if (cli != nullptr)
             {
                 cli->printDebugMessage("Error: Active connection is null", LFAST::ERROR_MESSAGE);
@@ -353,8 +353,8 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize()
                 debugCli->printfDebugMessage("deserializeJson() failed: %s", error.c_str());
             }
         }
-        #else
-         deserializeJson(this->JsonDoc, this->jsonInputBuffer);
+#else
+        deserializeJson(this->JsonDoc, this->jsonInputBuffer);
 #endif
     }
     else
@@ -362,7 +362,10 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize()
 #if defined(TERMINAL_ENABLED)
         debugCli->printfDebugMessage("jsonInputBuffer nullptr error");
 #endif
-        while (1) {;}
+        while (1)
+        {
+            ;
+        }
     }
     return this->JsonDoc;
 }
@@ -393,6 +396,22 @@ void LFAST::CommsService::stopDisconnectedClients()
         }
     }
 }
+
+// void LFAST::CommsMessage::startArray()
+// {
+//     msgIsArray = true;
+
+// }
+
+// void LFAST::CommsMessage::endArray()
+// {
+// }
+// void LFAST::CommsMessage::convertToArray()
+// {
+//     DynamicJsonDocument(JSON_PROGMEM_SIZE)
+//     JsonArray array = JsonDoc.to<JsonArray>();
+
+// }
 #if defined(TERMINAL_ENABLED)
 void LFAST::CommsService::setupPersistentFields()
 {
