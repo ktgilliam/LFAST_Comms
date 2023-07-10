@@ -3,10 +3,10 @@
 #include "ThermoElectricController.h"
 #include "ThermoElectricGlobal.h"
 #include "TimerOne.h"
+#include "TECMap.h"
 
 // Let's define some variables to hold the data to be transmitted back
 volatile float m_Channel_pwr[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
-// static bool m_Channel_dir[NUM_BOARDS][NUMBER_OF_CHANNELS] = {false};
 volatile float m_Channel_seebeck[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
 
 volatile float m_SeebeckStorage[NUMBER_OF_CHANNELS] = {0.00};
@@ -61,7 +61,7 @@ TECDataManager &TECDataManager::getDeviceController()
 
 void TECDataManager::enableControlInterrupt()
 {
-    Timer1.start();
+  Timer1.start();
 }
 
 /// @brief Interrupt for an interrupt-driven controller
@@ -73,15 +73,23 @@ void TECDataManager::enableControlInterrupt()
 void TECControl_ISR()
 {
   noInterrupts();
+
   TECDataManager &tdm = TECDataManager::getDeviceController();
   tdm.pingCollectionStateMachine();
+
   // Don't want to ping the SM in the interrupt. Only want to reset it.
   interrupts();
 }
 
-
 void TECDataManager::pingCollectionStateMachine()
 {
+  // cli->printDebugMessage("Inside ISR");
+  // static uint64_t c = 0;
+  // if ((c++) % 100 == 0)
+  // {
+  //   cli->printfDebugMessage("%d", c);
+  // }
+
   // No need to collect setpoints - they are stored upon being set
   COLLECTION_STATE nextState = INIT;
   switch (currentState)
@@ -90,10 +98,10 @@ void TECDataManager::pingCollectionStateMachine()
     nextState = WAITING;
     break;
   case WAITING:
-      nextState = COLLECT_BOARD_0;
-      // break;
+    nextState = COLLECT_BOARD_0;
+    // break;
   case COLLECT_BOARD_0:
-    getLocalSeebecks();
+    // getLocalSeebecks();
     if (this->isI2cController())
     {
       nextState = COLLECT_BOARD_1;
@@ -104,19 +112,19 @@ void TECDataManager::pingCollectionStateMachine()
     }
     break;
   case COLLECT_BOARD_1:
-    getRemoteSeebecks(1);
+    // getRemoteSeebecks(1);
     nextState = COLLECT_BOARD_2;
     break;
   case COLLECT_BOARD_2:
-    getRemoteSeebecks(2);
+    // getRemoteSeebecks(2);
     nextState = COLLECT_BOARD_3;
     break;
   case COLLECT_BOARD_3:
-    getRemoteSeebecks(3);
+    // getRemoteSeebecks(3);
     nextState = COLLECT_BOARD_4;
     break;
   case COLLECT_BOARD_4:
-    getRemoteSeebecks(4);
+    // getRemoteSeebecks(4);
     nextState = DONE_COLLECTING;
     break;
   case DONE_COLLECTING:
@@ -126,15 +134,27 @@ void TECDataManager::pingCollectionStateMachine()
   currentState = nextState;
 }
 
+void TECDataManager::processCommands()
+{
+  if (!requestList.empty())
+  {
+    TECDataCommand *cmdToProcess = requestList.front();
+    // Process the command
+    delete cmdToProcess;
+    requestList.pop_front();
+  }
+}
 void TECDataManager::initialize()
 {
-
   // Initialize Timer
   Timer1.initialize(UPDATE_PRD_US);
   Timer1.stop();
   Timer1.attachInterrupt(TECControl_ISR);
-  // setup the TECs
-  delay(1000);
+// setup the TECs
+// delay(1000);
+#if ADC_NOT_CONNECTED
+// Skipping this part
+#else
   for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
   {
     TEC[tec_chan].begin(
@@ -142,8 +162,10 @@ void TECDataManager::initialize()
         tec_ch_cfg[tec_chan].pwmPin,
         tec_ch_cfg[tec_chan].thermistor,
         tec_ch_cfg[tec_chan].minimum_percent);
+    TEST_SERIAL.printf("%d, ", tec_chan);
+    // delay(100);
   }
-
+#endif
   // **************************
   // Initialize the SPI port  *
   // **************************
@@ -172,7 +194,6 @@ void TECDataManager::initialize()
   }
   currentState = INIT;
 }
-
 
 //***********************************************
 //***********************************************
@@ -281,7 +302,6 @@ void TECDataManager::getRemoteSeebecks(uint8_t board)
 
 void TECDataManager::processDataCommands()
 {
-
 }
 //***********************************************
 //***********************************************
@@ -330,23 +350,23 @@ void TECDataManager::setupPersistentFields()
 
 void TECDataManager::printErrorStatus(uint8_t _error, uint8_t ch, uint8_t board)
 {
-  Serial.print("Channel: ");
-  Serial.println(ch);
-  Serial.print("Board number: ");
-  Serial.println(board);
-  Serial.print("Error = ");
-  Serial.println(_error);
+  TEST_SERIAL.print("Channel: ");
+  TEST_SERIAL.println(ch);
+  TEST_SERIAL.print("Board number: ");
+  TEST_SERIAL.println(board);
+  TEST_SERIAL.print("Error = ");
+  TEST_SERIAL.println(_error);
 }
 
 void TECDataManager::printStuff(uint8_t board, char *myseebeck)
 {
   for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
   {
-    Serial.print("Board: ");
-    Serial.println(board);
-    Serial.print("ADC Channel: ");
-    Serial.println(myseebeck[1] >> 4);
-    Serial.print("Conversion: ");
-    Serial.println(m_Channel_seebeck[board][tec_chan]);
+    TEST_SERIAL.print("Board: ");
+    TEST_SERIAL.println(board);
+    TEST_SERIAL.print("ADC Channel: ");
+    TEST_SERIAL.println(myseebeck[1] >> 4);
+    TEST_SERIAL.print("Conversion: ");
+    TEST_SERIAL.println(m_Channel_seebeck[board][tec_chan]);
   }
 }

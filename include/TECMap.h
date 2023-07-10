@@ -23,7 +23,7 @@ public:
             return defaultEntry;
         }
     }
-
+    
 private:
     static const TECMapEntry defaultEntry;
     static const std::vector<TECMapEntry> map;

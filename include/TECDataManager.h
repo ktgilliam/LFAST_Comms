@@ -1,6 +1,6 @@
 #pragma once
 #include <cinttypes>
-#include <vector>
+#include <deque>
 #include <LFAST_Device.h>
 #include <TerminalInterface.h>
 #include "ThermoElectricGlobal.h"
@@ -72,22 +72,25 @@ public:
     void getRemoteTECSetPoints(uint8_t board);
     void getLocalSeebecks();
     void getRemoteSeebecks(uint8_t board);
-    std::vector<TECDataCommand*> requestList;
+
 
     void pingCollectionStateMachine();
+    void processCommands();
     // void startCollectionCycle();
     void peripheralMode() { i2cControllerFlag = false; };
     void controllerMode(){ i2cControllerFlag = true; };
     bool isI2cController(){return i2cControllerFlag;}
     void setBoxNo(uint8_t _boxNo){boxNo = _boxNo;}
+    uint8_t getBoxNo(){return boxNo;}
     void addTecDataCommand(TECDataCommand* rq){requestList.push_back(rq);}
 
     void processDataCommands();
     void enableControlInterrupt();
-
+    
 private:
+    std::deque<TECDataCommand*> requestList;
     uint8_t i2c_hardware_id;
-    TECDataManager(){};
+    TECDataManager() : i2cControllerFlag(false) {};
     COLLECTION_STATE currentState;
     void printErrorStatus(uint8_t _error, uint8_t ch, uint8_t board);
     bool i2cControllerFlag;
