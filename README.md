@@ -6,6 +6,8 @@ and monitor temperature, or measure the seebeck voltage accross two point. Addit
 Calibration of thermistors is not required, but a calibration routine exists for more precise temperature data. Calibration data is then stored into Teensy EEPROM address: 1..., until cleared by user through client. EEPROM address 0 serves as calibration status flag. 
     If EEPROM.read(0) == 0x01, the TEC has been calibrated. 
 
+## NOTE! Everything below this line is out of date.
+
 ## Dependencies
 * Arduino.h 
 * Ethernet.h 
