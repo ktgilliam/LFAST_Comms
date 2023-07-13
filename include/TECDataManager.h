@@ -2,6 +2,7 @@
 #include <cinttypes>
 #include <deque>
 #include <LFAST_Device.h>
+#include <TECConfigManager.h>
 #include <TerminalInterface.h>
 #include "ThermoElectricGlobal.h"
 // These should be defined in wire.h but they don't appear to be, so creating them here.
@@ -79,6 +80,7 @@ public:
     // void startCollectionCycle();
     void peripheralMode() { i2cControllerFlag = false; };
     void controllerMode(){ i2cControllerFlag = true; };
+    void connectConfigManager(TECConfigManager *_pTcm) {pTcm = _pTcm;};
     bool isI2cController(){return i2cControllerFlag;}
     void setBoxNo(uint8_t _boxNo){boxNo = _boxNo;}
     uint8_t getBoxNo(){return boxNo;}
@@ -87,7 +89,9 @@ public:
     void processDataCommands();
     void enableControlInterrupt();
     
+    void setAllToZero();
 private:
+    TECConfigManager *pTcm;
     std::deque<TECDataCommand*> requestList;
     uint8_t i2c_hardware_id;
     TECDataManager() : i2cControllerFlag(false) {};

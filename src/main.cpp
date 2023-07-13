@@ -35,7 +35,7 @@ void setBoxNo(unsigned int boxNo);
 void boardNumber(unsigned int board);
 void channelNumber(unsigned int chan_num);
 void commandDutyCycle(float dc);
-
+void allToZero(int placeholder);
 void sendTecData(int placeholder);
 // void getTECValuesByBoard(int board);
 // void getSeebeckByBoard(int board);
@@ -65,8 +65,8 @@ void setup()
   // bool configPresent = true;
   if (configPresent)
   {
-
     pTdm->controllerMode();
+    pTdm->connectConfigManager(pTcm);
   // cli->printDebugMessage("1");
     // *************************
     // Setup the commsService with IP and port number
@@ -88,6 +88,7 @@ void setup()
       commsService->registerMessageHandler<unsigned int>("Board", boardNumber);
       commsService->registerMessageHandler<unsigned int>("Channel", channelNumber);
       commsService->registerMessageHandler<int>("SendAll", sendTecData);
+      commsService->registerMessageHandler<int>("AllToZero", allToZero);
     }
   }
   else
@@ -181,6 +182,7 @@ void channelNumber(unsigned int channel)
   }
   return;
 }
+
 void commandDutyCycle(float dc)
 {
   // If the box number didn't match, this should still be nullptr
@@ -204,6 +206,12 @@ void resetCommandData()
   boardNoSet = false;
   channelNoSet = false;
   valueSet = false;
+}
+
+void allToZero(int placeholder)
+{
+  cli->printDebugMessage("Inside allToZero");
+  pTdm->setAllToZero();
 }
 
 void sendTecData(int placeholder)
