@@ -133,4 +133,5 @@ enum ecodes
  
 const int UPDATE_PRD_US = (1*1e6);
 
+const double TEC_MAX_CURRENT = 0.8;
 #endif

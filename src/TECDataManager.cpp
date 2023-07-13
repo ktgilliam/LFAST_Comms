@@ -134,12 +134,22 @@ void TECDataManager::pingCollectionStateMachine()
   currentState = nextState;
 }
 
-void TECDataManager::processCommands()
+void TECDataManager::processDataCommands()
 {
   if (!requestList.empty())
   {
     TECDataCommand *cmdToProcess = requestList.front();
     // Process the command
+    double dutyCycle = 100.0* cmdToProcess->value / TEC_MAX_CURRENT;
+    cli->printfDebugMessage("Setting %d:%d to %f%", cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+    if (cmdToProcess->boardNo == pTcm->getThisBoardNo())
+    {
+      setLocalTECValue(cmdToProcess->channelNo, dutyCycle);
+    }
+    else
+    {
+      setRemoteTECValue(cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+    }
     delete cmdToProcess;
     requestList.pop_front();
   }
@@ -300,9 +310,6 @@ void TECDataManager::getRemoteSeebecks(uint8_t board)
   } // for loop close
 }
 
-void TECDataManager::processDataCommands()
-{
-}
 //***********************************************
 //***********************************************
 //** Functions for interfacing the local TECs

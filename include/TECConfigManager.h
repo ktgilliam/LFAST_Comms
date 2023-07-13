@@ -24,9 +24,11 @@ struct TECControllerConfig
 class TECConfigManager : SdConfigFileReader
 {
 public:
-    TECControllerConfig cfg;
     bool parseConfiguration(const char *fileName) override;
     uint8_t getThisBoardNo(){return controllerBoardNo;}
+    TECConfig* getTecConfig(uint8_t tecNo);
+
+    TECControllerConfig cfg;
 private:
     uint8_t controllerBoardNo;
 };

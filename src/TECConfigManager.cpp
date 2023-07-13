@@ -32,3 +32,17 @@ bool TECConfigManager::parseConfiguration(const char *fileName)
     return cardPresent;
 }
 
+
+TECConfig* TECConfigManager::getTecConfig(uint8_t tecNo)
+{
+    TECConfig* matchPtr = nullptr;
+    for(auto tec : cfg.tecConfigs)
+    {
+        if (tec->tecNo == tecNo)
+        {
+            matchPtr = tec;
+            break;
+        }
+    }
+    return matchPtr;
+}

@@ -31,25 +31,20 @@ TerminalInterface *cli;
 // Comms service objects and callbacks
 LFAST::TcpCommsService *commsService; // This is the commsService
 void handshake(unsigned int val);
-void setBoxNo(unsigned int boxNo);
+void setTecNo(unsigned int tecNo);
 void boardNumber(unsigned int board);
 void channelNumber(unsigned int chan_num);
-void commandDutyCycle(float dc);
+void commandTecAmps(float dc);
 void allToZero(int placeholder);
 void sendTecData(int placeholder);
 // void getTECValuesByBoard(int board);
 // void getSeebeckByBoard(int board);
-void resetCommandData();
 
 TECDataManager *pTdm;
 TECDataCommand *newCommandPtr = nullptr;
 
 TECConfigManager tcm;
 TECConfigManager *pTcm = &tcm;
-
-bool boardNoSet = false;
-bool channelNoSet = false;
-bool valueSet = false;
 
 void setup()
 {
@@ -67,7 +62,7 @@ void setup()
   {
     pTdm->controllerMode();
     pTdm->connectConfigManager(pTcm);
-  // cli->printDebugMessage("1");
+    // cli->printDebugMessage("1");
     // *************************
     // Setup the commsService with IP and port number
     // Only for the master TEC card
@@ -83,10 +78,11 @@ void setup()
     {
       //
       commsService->registerMessageHandler<unsigned int>("Handshake", handshake);
-      commsService->registerMessageHandler<unsigned int>("BoxNo", setBoxNo);
-      commsService->registerMessageHandler<float>("SetPoint", commandDutyCycle); // Will be changed to a current
-      commsService->registerMessageHandler<unsigned int>("Board", boardNumber);
-      commsService->registerMessageHandler<unsigned int>("Channel", channelNumber);
+      commsService->registerMessageHandler<unsigned int>("TecNo", setTecNo);
+      commsService->registerMessageHandler<float>("setTecAmps", commandTecAmps); // Will be changed to a current
+
+      // commsService->registerMessageHandler<unsigned int>("Board", boardNumber);
+      // commsService->registerMessageHandler<unsigned int>("Channel", channelNumber);
       commsService->registerMessageHandler<int>("SendAll", sendTecData);
       commsService->registerMessageHandler<int>("AllToZero", allToZero);
     }
@@ -147,66 +143,30 @@ void handshake(unsigned int val)
   return;
 }
 
-void setBoxNo(unsigned int boxNo)
+void setTecNo(unsigned int tecNo)
 {
-  pTdm->setBoxNo(boxNo);
+  // pTdm->setTecNo(tecNo);
+  cli->printfDebugMessage("New TEC Command: %d", tecNo);
+  auto tecCfg = pTcm->getTecConfig(tecNo);
+  if (tecCfg != nullptr)
+  {
+    newCommandPtr = new TECDataCommand(tecCfg->boardNo, tecCfg->channelNo);
+  }
 }
 
-void boardNumber(unsigned int board)
-{
-  if (newCommandPtr != nullptr)
-  {
-    // Something went wrong
-    delete newCommandPtr;
-    resetCommandData();
-  }
-  else
-  {
-    if (board == pTdm->getBoxNo())
-    {
-      newCommandPtr = new TECDataCommand();
-      newCommandPtr->boardNo = board;
-      boardNoSet = true;
-    }
-  }
-  return;
-}
-
-void channelNumber(unsigned int channel)
+void commandTecAmps(float currAmps)
 {
   // If the box number didn't match, this should still be nullptr
   if (newCommandPtr != nullptr)
   {
-    newCommandPtr->channelNo = channel;
-    channelNoSet = true;
+    newCommandPtr->type = CURRENT_COMMAND;
+    newCommandPtr->value = currAmps;
+    pTdm->addTecDataCommand(newCommandPtr);
+    newCommandPtr = nullptr;
   }
   return;
 }
 
-void commandDutyCycle(float dc)
-{
-  // If the box number didn't match, this should still be nullptr
-  if (newCommandPtr != nullptr)
-  {
-    newCommandPtr->type = DUTY_COMMAND;
-    valueSet = true;
-    newCommandPtr->value = dc;
-    if (boardNoSet && channelNoSet && valueSet)
-    {
-      pTdm->addTecDataCommand(newCommandPtr);
-      resetCommandData();
-    }
-  }
-  return;
-}
-
-void resetCommandData()
-{
-  newCommandPtr = nullptr;
-  boardNoSet = false;
-  channelNoSet = false;
-  valueSet = false;
-}
 
 void allToZero(int placeholder)
 {
@@ -217,27 +177,26 @@ void allToZero(int placeholder)
 void sendTecData(int placeholder)
 {
   cli->printDebugMessage("Inside sendTecData");
-  LFAST::CommsMessage* newMsg = new LFAST::CommsMessage();
+  LFAST::CommsMessage *newMsg = new LFAST::CommsMessage();
   bool result = false;
   unsigned int sentCfgs = 0;
   int sentMessages = 0;
   for (auto &tec : pTcm->cfg.tecConfigs)
   {
     result = newMsg->startNewArrayObject("tecConfigList");
-    if(!result)
+    if (!result)
     {
-        commsService->sendMessage(*newMsg, LFAST::CommsService::ACTIVE_CONNECTION);
-        sentMessages++;
-        delete newMsg;
-        newMsg = new LFAST::CommsMessage();
-        result = newMsg->startNewArrayObject("tecConfigList");
+      commsService->sendMessage(*newMsg, LFAST::CommsService::ACTIVE_CONNECTION);
+      sentMessages++;
+      delete newMsg;
+      newMsg = new LFAST::CommsMessage();
+      result = newMsg->startNewArrayObject("tecConfigList");
     }
     newMsg->addKeyValuePairToArrayItemObject<unsigned int>("ID", tec->tecNo);
     newMsg->addKeyValuePairToArrayItemObject<unsigned int>("BRD", tec->boardNo);
     newMsg->addKeyValuePairToArrayItemObject<unsigned int>("CHN", tec->channelNo);
-//FIXME::!!! There is a problem where if the buffer is full it will just leave one of these out. It needs to be fixed properly in CommService!!!!!
+    // FIXME::!!! There is a problem where if the buffer is full it will just leave one of these out. It needs to be fixed properly in CommService!!!!!
     sentCfgs++;
-
   }
   newMsg->addKeyValuePair("SentConfigs", sentCfgs);
   commsService->sendMessage(*newMsg, LFAST::CommsService::ACTIVE_CONNECTION);
