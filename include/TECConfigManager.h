@@ -17,13 +17,18 @@ struct TECControllerConfig
 {
     uint8_t ip[4];
     uint16_t port;
+    uint8_t boardNo;
     std::vector<TECConfig*> tecConfigs;
 };
 
 class TECConfigManager : SdConfigFileReader
 {
 public:
-    TECControllerConfig cfg;
     bool parseConfiguration(const char *fileName) override;
-    
+    uint8_t getThisBoardNo(){return controllerBoardNo;}
+    TECConfig* getTecConfig(uint8_t tecNo);
+
+    TECControllerConfig cfg;
+private:
+    uint8_t controllerBoardNo;
 };

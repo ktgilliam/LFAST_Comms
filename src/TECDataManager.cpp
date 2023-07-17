@@ -8,7 +8,6 @@
 // Let's define some variables to hold the data to be transmitted back
 volatile float m_Channel_pwr[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
 volatile float m_Channel_seebeck[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
-
 volatile float m_SeebeckStorage[NUMBER_OF_CHANNELS] = {0.00};
 
 ThermoElectricController TEC[NUM_TEC];
@@ -19,6 +18,7 @@ int blink = 0;
 /******************
  * Begin Configure
  ******************/
+// This struct is the same for every board.
 const struct TEC_Channel_Config tec_ch_cfg[] =
     {
         // dir, pwm, thermistor or seebeck, min
@@ -134,12 +134,22 @@ void TECDataManager::pingCollectionStateMachine()
   currentState = nextState;
 }
 
-void TECDataManager::processCommands()
+void TECDataManager::processDataCommands()
 {
   if (!requestList.empty())
   {
     TECDataCommand *cmdToProcess = requestList.front();
     // Process the command
+    double dutyCycle = 100.0* cmdToProcess->value / TEC_MAX_CURRENT;
+    cli->printfDebugMessage("Setting %d:%d to %f%", cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+    if (cmdToProcess->boardNo == pTcm->getThisBoardNo())
+    {
+      setLocalTECValue(cmdToProcess->channelNo, dutyCycle);
+    }
+    else
+    {
+      setRemoteTECValue(cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+    }
     delete cmdToProcess;
     requestList.pop_front();
   }
@@ -300,9 +310,6 @@ void TECDataManager::getRemoteSeebecks(uint8_t board)
   } // for loop close
 }
 
-void TECDataManager::processDataCommands()
-{
-}
 //***********************************************
 //***********************************************
 //** Functions for interfacing the local TECs
@@ -368,5 +375,22 @@ void TECDataManager::printStuff(uint8_t board, char *myseebeck)
     TEST_SERIAL.println(myseebeck[1] >> 4);
     TEST_SERIAL.print("Conversion: ");
     TEST_SERIAL.println(m_Channel_seebeck[board][tec_chan]);
+  }
+}
+
+void TECDataManager::setAllToZero()
+{
+  for (auto &tec : pTcm->cfg.tecConfigs)
+  {
+    if (tec->boardNo == pTcm->getThisBoardNo())
+    {
+      setLocalTECValue(tec->channelNo, 0.0);
+      cli->printfDebugMessage("Set local TEC%d to 0.0.", tec->channelNo);
+    }
+    else
+    {
+      setRemoteTECValue(tec->boardNo, tec->channelNo, 0.0);
+      cli->printfDebugMessage("Set remote TEC%d:%d to 0.0.",tec->boardNo, tec->channelNo);
+    }
   }
 }
