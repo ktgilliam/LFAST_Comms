@@ -31,8 +31,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <SPI.h>
 #include <Wire.h>
 
-#ifndef THERMOELECTRIC_CONTROLLER_GLOBAL_H
-#define THERMOELECTRIC_CONTROLLER_GLOBAL_H
+#pragma once
 
 // Overall version of the VCM module
 #define TEC_VERSION    "1.0 dev 1"
@@ -45,10 +44,6 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 //#define DEBUG
 
 //Only one of these should be defined, based on thermistor value.
-#define thermistor_10K
-//#define thermistor_2K
-
-//TODO: add TEST flag maybe?
 
 #define TEENSY_4_1
 
@@ -134,4 +129,3 @@ enum ecodes
 const int UPDATE_PRD_US = (1*1e6);
 
 const double TEC_MAX_CURRENT = 0.8;
-#endif

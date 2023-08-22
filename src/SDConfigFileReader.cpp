@@ -28,7 +28,15 @@ bool SdConfigFileReader::loadConfiguration(const char* fileName)
             ReadBufferingStream bufferedFile(configFile, 64);
             DeserializationError error = deserializeJson(doc, bufferedFile);
             if (error)
-                TEST_SERIAL.println(F("Failed to read file, using default configuration"));
+            {
+                Serial.begin(9600);
+                while(1)
+                {
+                Serial.print(F("Failed to read file, using default configuration ["));
+                Serial.print(error.c_str());
+                Serial.println("]");
+                }
+            }
         }
         // close the file:
         configFile.close();

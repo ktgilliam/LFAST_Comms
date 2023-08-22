@@ -157,7 +157,7 @@ void reportSetPointHandler(uint8_t chan)
     short data;
     bool dir;
     /* code */
-    data = round(TEC[chan].getPower() * 100.0); // This gets the power for the requested channel, now we need to send it
+    data = round(TEC[chan].getDutyCycle() * 100.0); // This gets the power for the requested channel, now we need to send it
                                                 //        Serial.print("Data: "); Serial.println(data);
     dir = TEC[chan].getDirection();
     data *= dir * -1;

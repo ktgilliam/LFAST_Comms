@@ -5,6 +5,7 @@ bool TECConfigManager::parseConfiguration(const char *fileName)
     bool cardPresent = loadConfiguration(fileName);
     if (cardPresent)
     {
+        cfg.boxNo = doc["BOX_ID"];
         cfg.port = doc["Port"];
         uint8_t idx = 0;
         uint8_t minBoardNo = 99;

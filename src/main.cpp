@@ -34,7 +34,7 @@ void handshake(unsigned int val);
 void setTecNo(unsigned int tecNo);
 void boardNumber(unsigned int board);
 void channelNumber(unsigned int chan_num);
-void commandTecAmps(float dc);
+void commandTecDutyCycle(float dc);
 void allToZero(int placeholder);
 void sendTecData(int placeholder);
 // void getTECValuesByBoard(int board);
@@ -49,8 +49,11 @@ TECConfigManager *pTcm = &tcm;
 void setup()
 {
   // delay(3000);
+#if HARDWARE_SERIAL == 1
   cli = new TerminalInterface(DEVICE_CLI_LABEL, &(TEST_SERIAL), TEST_SERIAL_BAUD);
-
+#else
+  cli = new TerminalInterface(DEVICE_CLI_LABEL, &(TEST_SERIAL));
+#endif
   TECDataManager &tdm = TECDataManager::getDeviceController();
   pTdm = &tdm;
   pTdm->connectTerminalInterface(cli, DEVICE_CLI_LABEL);
@@ -78,8 +81,8 @@ void setup()
     {
       //
       commsService->registerMessageHandler<unsigned int>("Handshake", handshake);
-      commsService->registerMessageHandler<unsigned int>("TecNo", setTecNo);
-      commsService->registerMessageHandler<float>("setTecAmps", commandTecAmps); // Will be changed to a current
+      commsService->registerMessageHandler<unsigned int>("TECNo", setTecNo);
+      commsService->registerMessageHandler<float>("SetDuty", commandTecDutyCycle); // Will be changed to a current
 
       // commsService->registerMessageHandler<unsigned int>("Board", boardNumber);
       // commsService->registerMessageHandler<unsigned int>("Channel", channelNumber);
@@ -126,6 +129,11 @@ void loop()
     commsService->stopDisconnectedClients();
     pTdm->processDataCommands();
   }
+  else
+  {
+    
+  }
+  // Serial.println("inside loop.");
 }
 
 /// @brief Handshake function to confirm connection
@@ -154,7 +162,7 @@ void setTecNo(unsigned int tecNo)
   }
 }
 
-void commandTecAmps(float currAmps)
+void commandTecDutyCycle(float currAmps)
 {
   // If the box number didn't match, this should still be nullptr
   if (newCommandPtr != nullptr)

@@ -3,402 +3,262 @@
 	"IP": [169, 254, 84, 177],
 	"Port": 4600,
 	"TEC": [{
-			"ID": 3,
-			"BOARD": 4,
-			"CHANNEL": 2
-		},
-		{
-			"ID": 4,
-			"BOARD": 3,
-			"CHANNEL": 1
-		},
-		{
-			"ID": 5,
-			"BOARD": 1,
-			"CHANNEL": 3
-		},
-		{
-			"ID": 6,
-			"BOARD": 0,
-			"CHANNEL": 2
-		},
-		{
-			"ID": 10,
-			"BOARD": 0,
-			"CHANNEL": 3
-		},
-		{
-			"ID": 11,
-			"BOARD": 4,
-			"CHANNEL": 1
-		},
-		{
-			"ID": 12,
-			"BOARD": 2,
-			"CHANNEL": 1
-		},
-		{
-			"ID": 13,
-			"BOARD": 2,
-			"CHANNEL": 3
-		},
-		{
-			"ID": 14,
-			"BOARD": 3,
-			"CHANNEL": 2
-		},
-		{
-			"ID": 15,
-			"BOARD": 1,
-			"CHANNEL": 2
-		},
-		{
-			"ID": 16,
-			"BOARD": 4,
-			"CHANNEL": 3
-		},
-		{
-			"ID": 17,
-			"BOARD": 0,
-			"CHANNEL": 1
-		},
-		{
-			"ID": 21,
-			"BOARD": 3,
-			"CHANNEL": 3
-		},
-		{
-			"ID": 22,
+			"ID": 1,
 			"BOARD": 2,
 			"CHANNEL": 2
 		},
 		{
-			"ID": 23,
+			"ID": 2,
+			"BOARD": 0,
+			"CHANNEL": 3
+		},
+		{
+			"ID": 7,
+			"BOARD": 2,
+			"CHANNEL": 1
+		},
+		{
+			"ID": 8,
+			"BOARD": 2,
+			"CHANNEL": 3
+		},
+		{
+			"ID": 9,
+			"BOARD": 0,
+			"CHANNEL": 2
+		},
+		{
+			"ID": 18,
 			"BOARD": 1,
 			"CHANNEL": 1
 		},
 		{
-			"ID": 27,
-			"BOARD": 4,
-			"CHANNEL": 6
-		},
-		{
-			"ID": 28,
-			"BOARD": 3,
-			"CHANNEL": 5
-		},
-		{
-			"ID": 29,
+			"ID": 19,
 			"BOARD": 1,
-			"CHANNEL": 7
+			"CHANNEL": 2
 		},
 		{
-			"ID": 30,
+			"ID": 20,
 			"BOARD": 0,
-			"CHANNEL": 5
+			"CHANNEL": 1
 		},
 		{
-			"ID": 34,
-			"BOARD": 0,
-			"CHANNEL": 6
-		},
-		{
-			"ID": 35,
-			"BOARD": 4,
-			"CHANNEL": 5
-		},
-		{
-			"ID": 36,
-			"BOARD": 2,
-			"CHANNEL": 4
-		},
-		{
-			"ID": 37,
+			"ID": 24,
 			"BOARD": 3,
-			"CHANNEL": 4
+			"CHANNEL": 1
 		},
 		{
-			"ID": 38,
-			"BOARD": 3,
-			"CHANNEL": 6
-		},
-		{
-			"ID": 39,
-			"BOARD": 1,
-			"CHANNEL": 6
-		},
-		{
-			"ID": 40,
-			"BOARD": 4,
-			"CHANNEL": 7
-		},
-		{
-			"ID": 41,
-			"BOARD": 0,
-			"CHANNEL": 4
-		},
-		{
-			"ID": 46,
-			"BOARD": 0,
-			"CHANNEL": 7
-		},
-		{
-			"ID": 47,
-			"BOARD": 4,
-			"CHANNEL": 4
-		},
-		{
-			"ID": 48,
+			"ID": 25,
 			"BOARD": 2,
 			"CHANNEL": 5
 		},
 		{
-			"ID": 49,
-			"BOARD": 2,
-			"CHANNEL": 7
-		},
-		{
-			"ID": 50,
-			"BOARD": 3,
-			"CHANNEL": 7
-		},
-		{
-			"ID": 51,
+			"ID": 26,
 			"BOARD": 1,
-			"CHANNEL": 5
+			"CHANNEL": 3
 		},
 		{
-			"ID": 57,
-			"BOARD": 3,
-			"CHANNEL": 8
+			"ID": 31,
+			"BOARD": 2,
+			"CHANNEL": 4
 		},
 		{
-			"ID": 58,
+			"ID": 32,
 			"BOARD": 2,
 			"CHANNEL": 6
 		},
 		{
-			"ID": 59,
+			"ID": 33,
+			"BOARD": 0,
+			"CHANNEL": 7
+		},
+		{
+			"ID": 42,
 			"BOARD": 1,
 			"CHANNEL": 4
 		},
 		{
-			"ID": 63,
-			"BOARD": 4,
-			"CHANNEL": 10
-		},
-		{
-			"ID": 64,
-			"BOARD": 3,
-			"CHANNEL": 10
-		},
-		{
-			"ID": 65,
+			"ID": 43,
 			"BOARD": 1,
-			"CHANNEL": 10
+			"CHANNEL": 7
 		},
 		{
-			"ID": 66,
-			"BOARD": 0,
-			"CHANNEL": 9
-		},
-		{
-			"ID": 70,
-			"BOARD": 0,
-			"CHANNEL": 10
-		},
-		{
-			"ID": 71,
-			"BOARD": 4,
-			"CHANNEL": 9
-		},
-		{
-			"ID": 72,
+			"ID": 44,
 			"BOARD": 2,
-			"CHANNEL": 8
+			"CHANNEL": 7
 		},
 		{
-			"ID": 73,
+			"ID": 45,
+			"BOARD": 0,
+			"CHANNEL": 6
+		},
+		{
+			"ID": 52,
+			"BOARD": 0,
+			"CHANNEL": 4
+		},
+		{
+			"ID": 53,
 			"BOARD": 3,
-			"CHANNEL": 9
+			"CHANNEL": 3
 		},
 		{
-			"ID": 74,
-			"BOARD": 3,
-			"CHANNEL": 11
-		},
-		{
-			"ID": 75,
+			"ID": 54,
 			"BOARD": 1,
-			"CHANNEL": 9
+			"CHANNEL": 5
 		},
 		{
-			"ID": 76,
-			"BOARD": 4,
-			"CHANNEL": 11
+			"ID": 55,
+			"BOARD": 1,
+			"CHANNEL": 6
 		},
 		{
-			"ID": 77,
+			"ID": 56,
 			"BOARD": 0,
-			"CHANNEL": 8
+			"CHANNEL": 5
 		},
 		{
-			"ID": 82,
-			"BOARD": 0,
-			"CHANNEL": 11
-		},
-		{
-			"ID": 83,
-			"BOARD": 4,
-			"CHANNEL": 8
-		},
-		{
-			"ID": 84,
-			"BOARD": 2,
-			"CHANNEL": 9
-		},
-		{
-			"ID": 85,
-			"BOARD": 2,
-			"CHANNEL": 10
-		},
-		{
-			"ID": 86,
+			"ID": 60,
 			"BOARD": 3,
-			"CHANNEL": 12
+			"CHANNEL": 2
 		},
 		{
-			"ID": 87,
+			"ID": 61,
+			"BOARD": 2,
+			"CHANNEL": 9
+		},
+		{
+			"ID": 62,
 			"BOARD": 1,
 			"CHANNEL": 8
 		},
 		{
-			"ID": 93,
-			"BOARD": 4,
-			"CHANNEL": 14
+			"ID": 67,
+			"BOARD": 2,
+			"CHANNEL": 8
 		},
 		{
-			"ID": 94,
-			"BOARD": 3,
-			"CHANNEL": 14
+			"ID": 68,
+			"BOARD": 2,
+			"CHANNEL": 10
 		},
 		{
-			"ID": 95,
+			"ID": 69,
+			"BOARD": 0,
+			"CHANNEL": 10
+		},
+		{
+			"ID": 78,
+			"BOARD": 1,
+			"CHANNEL": 9
+		},
+		{
+			"ID": 79,
+			"BOARD": 1,
+			"CHANNEL": 11
+		},
+		{
+			"ID": 80,
 			"BOARD": 2,
 			"CHANNEL": 11
 		},
 		{
-			"ID": 96,
+			"ID": 81,
 			"BOARD": 0,
+			"CHANNEL": 9
+		},
+		{
+			"ID": 88,
+			"BOARD": 0,
+			"CHANNEL": 8
+		},
+		{
+			"ID": 89,
+			"BOARD": 3,
+			"CHANNEL": 4
+		},
+		{
+			"ID": 90,
+			"BOARD": 1,
+			"CHANNEL": 10
+		},
+		{
+			"ID": 91,
+			"BOARD": 2,
+			"CHANNEL": 13
+		},
+		{
+			"ID": 92,
+			"BOARD": 1,
+			"CHANNEL": 12
+		},
+		{
+			"ID": 97,
+			"BOARD": 2,
+			"CHANNEL": 12
+		},
+		{
+			"ID": 98,
+			"BOARD": 2,
 			"CHANNEL": 14
 		},
 		{
-			"ID": 100,
-			"BOARD": 1,
+			"ID": 99,
+			"BOARD": 0,
+			"CHANNEL": 13
+		},
+		{
+			"ID": 106,
+			"BOARD": 0,
 			"CHANNEL": 11
 		},
 		{
-			"ID": 101,
-			"BOARD": 4,
-			"CHANNEL": 13
-		},
-		{
-			"ID": 102,
-			"BOARD": 2,
-			"CHANNEL": 12
-		},
-		{
-			"ID": 103,
-			"BOARD": 3,
-			"CHANNEL": 13
-		},
-		{
-			"ID": 104,
-			"BOARD": 3,
-			"CHANNEL": 15
-		},
-		{
-			"ID": 105,
+			"ID": 108,
 			"BOARD": 1,
 			"CHANNEL": 13
 		},
 		{
-			"ID": 107,
-			"BOARD": 0,
-			"CHANNEL": 13
-		},
-		{
-			"ID": 111,
-			"BOARD": 4,
-			"CHANNEL": 12
-		},
-		{
-			"ID": 112,
-			"BOARD": 2,
-			"CHANNEL": 13
-		},
-		{
-			"ID": 113,
-			"BOARD": 1,
-			"CHANNEL": 12
-		},
-		{
-			"ID": 114,
-			"BOARD": 0,
-			"CHANNEL": 12
-		},
-		{
-			"ID": 118,
+			"ID": 109,
 			"BOARD": 1,
 			"CHANNEL": 14
 		},
 		{
-			"ID": 119,
-			"BOARD": 4,
-			"CHANNEL": 15
-		},
-		{
-			"ID": 120,
-			"BOARD": 2,
-			"CHANNEL": 14
-		},
-		{
-			"ID": 121,
-			"BOARD": 2,
-			"CHANNEL": 15
-		},
-		{
-			"ID": 122,
-			"BOARD": 3,
-			"CHANNEL": 16
-		},
-		{
-			"ID": 123,
-			"BOARD": 1,
-			"CHANNEL": 15
-		},
-		{
-			"ID": 125,
+			"ID": 110,
 			"BOARD": 0,
+			"CHANNEL": 12
+		},
+		{
+			"ID": 115,
+			"BOARD": 2,
 			"CHANNEL": 15
 		},
 		{
-			"ID": 129,
-			"BOARD": 4,
-			"CHANNEL": 16
-		},
-		{
-			"ID": 130,
+			"ID": 116,
 			"BOARD": 2,
 			"CHANNEL": 16
 		},
 		{
-			"ID": 131,
+			"ID": 117,
+			"BOARD": 0,
+			"CHANNEL": 15
+		},
+		{
+			"ID": 124,
+			"BOARD": 0,
+			"CHANNEL": 14
+		},
+		{
+			"ID": 126,
+			"BOARD": 1,
+			"CHANNEL": 15
+		},
+		{
+			"ID": 127,
 			"BOARD": 1,
 			"CHANNEL": 16
 		},
 		{
-			"ID": 132,
+			"ID": 128,
 			"BOARD": 0,
 			"CHANNEL": 16
 		}

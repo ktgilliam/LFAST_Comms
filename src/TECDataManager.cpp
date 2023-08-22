@@ -11,7 +11,6 @@ volatile float m_Channel_seebeck[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
 volatile float m_SeebeckStorage[NUMBER_OF_CHANNELS] = {0.00};
 
 ThermoElectricController TEC[NUM_TEC];
-Thermistor therm[NUM_TEC];
 bool calibrated = false;
 int blink = 0;
 
@@ -23,22 +22,22 @@ const struct TEC_Channel_Config tec_ch_cfg[] =
     {
         // dir, pwm, thermistor or seebeck, min
         // Digital number for dir(ection) bit, Digital number for pwm signal, thermistor or seebeck, min
-        {32, 29, 0, 0}, // 0
-        {21, 28, 0, 0}, // 1
-        {26, 25, 0, 0}, // 2
-        {20, 24, 0, 0}, // 3
-        {27, 9, 0, 0},  // 4
-        {33, 8, 0, 0},  // 5
-        {41, 5, 0, 0},  // 6
-        {19, 4, 0, 0},  // 7
-        {18, 1, 0, 0},  // 8
-        {34, 7, 0, 0},  // 9
-        {14, 36, 0, 0}, // 10
-        {40, 3, 0, 0},  // 11
-        {23, 0, 0, 0},  // 12
-        {39, 6, 0, 0},  // 13
-        {15, 37, 0, 0}, // 14
-        {22, 2, 0, 0},  // 15
+        {32, 29, 0}, // 0
+        {21, 28, 0}, // 1
+        {26, 25, 0}, // 2
+        {20, 24, 0}, // 3
+        {27, 9, 0},  // 4
+        {33, 8, 0},  // 5
+        {41, 5, 0},  // 6
+        {19, 4, 0},  // 7
+        {18, 1, 0},  // 8
+        {34, 7, 0},  // 9
+        {14, 36, 0}, // 10
+        {40, 3, 0},  // 11
+        {23, 0, 0},  // 12
+        {39, 6, 0},  // 13
+        {15, 37, 0}, // 14
+        {22, 2, 0},  // 15
 };
 /*
  ******************
@@ -83,13 +82,6 @@ void TECControl_ISR()
 
 void TECDataManager::pingCollectionStateMachine()
 {
-  // cli->printDebugMessage("Inside ISR");
-  // static uint64_t c = 0;
-  // if ((c++) % 100 == 0)
-  // {
-  //   cli->printfDebugMessage("%d", c);
-  // }
-
   // No need to collect setpoints - they are stored upon being set
   COLLECTION_STATE nextState = INIT;
   switch (currentState)
@@ -365,18 +357,18 @@ void TECDataManager::printErrorStatus(uint8_t _error, uint8_t ch, uint8_t board)
   TEST_SERIAL.println(_error);
 }
 
-void TECDataManager::printStuff(uint8_t board, char *myseebeck)
-{
-  for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
-  {
-    TEST_SERIAL.print("Board: ");
-    TEST_SERIAL.println(board);
-    TEST_SERIAL.print("ADC Channel: ");
-    TEST_SERIAL.println(myseebeck[1] >> 4);
-    TEST_SERIAL.print("Conversion: ");
-    TEST_SERIAL.println(m_Channel_seebeck[board][tec_chan]);
-  }
-}
+// void TECDataManager::printStuff(uint8_t board, char *myseebeck)
+// {
+//   for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
+//   {
+//     TEST_SERIAL.print("Board: ");
+//     TEST_SERIAL.println(board);
+//     TEST_SERIAL.print("ADC Channel: ");
+//     TEST_SERIAL.println(myseebeck[1] >> 4);
+//     TEST_SERIAL.print("Conversion: ");
+//     TEST_SERIAL.println(m_Channel_seebeck[board][tec_chan]);
+//   }
+// }
 
 void TECDataManager::setAllToZero()
 {
