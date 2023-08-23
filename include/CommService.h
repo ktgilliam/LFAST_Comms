@@ -17,7 +17,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 ///
 /// The LFAST Comms library (of which TcpCommsService is a component)
 /// works by associating JSON key-value pairs to function pointers.
-/// When a key is received, the library checks to see if a function 
+/// When a key is received, the library checks to see if a function
 /// pointer has been registered for it. If it has, it calls that function
 /// and passes the value from the key-value pair as an argument.
 /// This template defines and registers two such callbacks in this file.
@@ -39,8 +39,9 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #define MAX_ARGS 4
 #define RX_BUFF_SIZE 1024
 
-#define MAX_KV_PAIRS 20
+#define MAX_KV_PAIRS 60
 #define JSON_PROGMEM_SIZE JSON_OBJECT_SIZE(MAX_KV_PAIRS)
+#define JSON_MAX_ARRAY_ITEM_SIZE JSON_OBJECT_SIZE(10)
 
 #define MAX_CTRL_MESSAGES 0x40U // can be increased if needed
 
@@ -60,6 +61,11 @@ enum COMMS_SERVICE_INFO_ROWS
 };
 namespace LFAST
 {
+    enum MESSAGE_TYPE
+    {
+        ARRAY_MESSAGE,
+        OBJECT_MESSAGE
+    };
     ///////////////// TYPES /////////////////
     class CommsMessage
     {
@@ -81,16 +87,23 @@ namespace LFAST
 #if defined(TERMINAL_ENABLED)
         DynamicJsonDocument &deserialize(TerminalInterface *debugCli = nullptr);
 #else
-    DynamicJsonDocument &deserialize();
+        DynamicJsonDocument &deserialize();
 #endif
         template <typename T>
         inline T getValue(const char *key);
 
         template <typename T>
         inline void addKeyValuePair(const char *key, T val);
+        inline bool startNewArrayObjectItem();
+        inline bool startNewArrayObjectItem(const char *key);
+        inline bool startNewArray(const char *key);
+        template <typename T>
+        inline void addKeyValuePairToArray(const char *key, T val);
+        template <typename T>
+        inline void addKeyValuePairToArrayObjectItem(const char *key, T val);
         // inline void addKeyValuePair(const char *  key, T val);
         inline void addDestinationKey(const char *key){};
-
+        // bool isMessageFull();
         const char *getBuffPtr()
         {
             return jsonInputBuffer;
@@ -104,13 +117,19 @@ namespace LFAST
         {
             return processed;
         }
+
 #if defined(TERMINAL_ENABLED)
         void printMessageInfo(TerminalInterface *debugCli = nullptr);
 #endif
+
     protected:
         DynamicJsonDocument JsonDoc;
         bool processed;
+        JsonArray array;
+        JsonObject nested;
         std::string destKey;
+        std::string arrayKey;
+        size_t arrayMemUsagePrev;
     };
 
     template <class T>
@@ -159,7 +178,7 @@ namespace LFAST
         ClientConnection *activeConnection;
         bool commsServiceStatus;
 
-        #if defined(TERMINAL_ENABLED)
+#if defined(TERMINAL_ENABLED)
         virtual void setupPersistentFields() override;
 #endif
     private:
@@ -400,22 +419,80 @@ namespace LFAST
     template <typename T>
     inline void CommsMessage::addKeyValuePair(const char *key, T val)
     {
-        {
-            if (this->destKey.length() > 0)
-                JsonDoc[(this->destKey)][(key)] = val;
-            else
-                JsonDoc[(key)] = val;
-        };
+        if (this->destKey.length() > 0)
+            JsonDoc[(this->destKey)][(key)] = val;
+        else
+            JsonDoc[(key)] = val;
     }
 
-    template <>
-    inline void LFAST::CommsMessage::addKeyValuePair(const char *key, const char *val)
+    template <typename T>
+    inline void CommsMessage::addKeyValuePairToArray(const char *key, T val)
     {
+        // if (msgIsArray && !nested.isNull())
+        if (JsonDoc.is<JsonArray>() && !nested.isNull())
         {
-            if (this->destKey.length() > 0)
-                JsonDoc[(this->destKey)][(key)] = val;
-            else
-                JsonDoc[(key)] = val;
-        };
+            nested[(key)] = val;
+        }
     }
+
+    inline bool CommsMessage::startNewArray(const char *key)
+    {
+        // msgIsArray = true;
+        arrayKey = key;
+        // array = JsonDoc.to<JsonArray>();
+        array = JsonDoc.createNestedArray(arrayKey);
+        arrayMemUsagePrev = 0;
+        return true;
+    }
+
+    // Returns true if it was able to do this without overflowing?
+    inline bool CommsMessage::startNewArrayObjectItem(const char *key)
+    {
+        arrayKey = key;
+        if (array.isNull())
+        {
+            startNewArray(key);
+        }
+        return startNewArrayObjectItem();
+    }
+
+    inline bool CommsMessage::startNewArrayObjectItem()
+    {
+        bool success = false;
+        size_t arrayMemUsageCurr;
+        size_t memUsageDiff;
+        if (nested.isNull())
+        {
+            nested = array.createNestedObject();
+            success = true;
+        }
+        else
+        {
+            arrayMemUsageCurr = array.memoryUsage();
+            memUsageDiff = arrayMemUsageCurr - arrayMemUsagePrev;
+            arrayMemUsagePrev = arrayMemUsageCurr;
+            bool test0 = arrayMemUsageCurr >= JSON_PROGMEM_SIZE;
+            bool test1 = (arrayMemUsageCurr + memUsageDiff + JSON_MAX_ARRAY_ITEM_SIZE) > JSON_PROGMEM_SIZE;
+            if (test0 || test1)
+            {
+                success = false;
+            }
+            else
+            {
+                nested = array.createNestedObject();
+                success = true;
+            }
+        }
+        return success;
+    }
+
+    template <typename T>
+    inline void CommsMessage::addKeyValuePairToArrayObjectItem(const char *key, T val)
+    {
+        if (!nested.isNull())
+        {
+            nested[(key)] = val;
+        }
+    }
+
 };
