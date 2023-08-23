@@ -299,7 +299,7 @@ void TerminalInterface::printDebugMessage(const std::string &msg, uint8_t level)
         cursorToRowCol((firstDebugRow + debugRowOffset++), 0);
         clearToEndOfRow();
         debugMessages.push_back(msgPrintSr);
-        serial->println(msgPrintSr.c_str());
+        serial->print(msgPrintSr.c_str());
     }
     else
     {

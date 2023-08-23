@@ -60,19 +60,20 @@ enum COMMS_SERVICE_INFO_ROWS
 };
 namespace LFAST
 {
+    enum MESSAGE_TYPE
+    {
+        ARRAY_MESSAGE,
+        OBJECT_MESSAGE
+    };
     ///////////////// TYPES /////////////////
     class CommsMessage
     {
     public:
-        CommsMessage(bool isArray = false)
-            : JsonDoc(DynamicJsonDocument(JSON_PROGMEM_SIZE)), msgIsArray(isArray)
+        CommsMessage()
+            : JsonDoc(DynamicJsonDocument(JSON_PROGMEM_SIZE))
         {
             std::memset(this->jsonInputBuffer, 0, sizeof(this->jsonInputBuffer));
             processed = false;
-            if (isArray)
-            {
-                array = JsonDoc.to<JsonArray>();
-            }
         }
         virtual ~CommsMessage() {}
         virtual void placeholder() {}
@@ -92,12 +93,13 @@ namespace LFAST
 
         template <typename T>
         inline void addKeyValuePair(const char *key, T val);
+        inline bool startNewArrayObject();
+        inline bool startNewArray(const char *key);
+        template <typename T>
         inline void addKeyValuePairToArray(const char *key, T val);
         // inline void addKeyValuePair(const char *  key, T val);
         inline void addDestinationKey(const char *key){};
-        // void startArray();
-        // void endArray();
-        // void convertToArray();
+        // bool isMessageFull();
         const char *getBuffPtr()
         {
             return jsonInputBuffer;
@@ -119,9 +121,11 @@ namespace LFAST
     protected:
         DynamicJsonDocument JsonDoc;
         bool processed;
-        bool msgIsArray;
         JsonArray array;
+        JsonObject nested;
         std::string destKey;
+        std::string arrayKey;
+        size_t arrayMemUsagePrev;
     };
 
     template <class T>
@@ -420,18 +424,59 @@ namespace LFAST
     template <typename T>
     inline void CommsMessage::addKeyValuePairToArray(const char *key, T val)
     {
-        if (msgIsArray)
+        // if (msgIsArray && !nested.isNull())
+        if (JsonDoc.is<JsonArray>() && !nested.isNull())
         {
-            JsonObject nested = array.createNestedObject();
             nested[(key)] = val;
         }
     }
-    // template <>
-    // inline void LFAST::CommsMessage::addKeyValuePair(const char *key, const char *val)
-    // {
-    //     if (this->destKey.length() > 0)
-    //         JsonDoc[(this->destKey)][(key)] = val;
-    //     else
-    //         JsonDoc[(key)] = val;
-    // }
+
+    inline bool CommsMessage::startNewArray(const char *key)
+    {
+        // msgIsArray = true;
+        arrayKey = key;
+        // array = JsonDoc.to<JsonArray>();
+        array = JsonDoc.createNestedArray(arrayKey);
+        arrayMemUsagePrev = 0;
+        return true;
+    }
+
+    inline bool CommsMessage::startNewArrayObject()
+    {
+        bool success = false;
+        // if (!JsonDoc.is<JsonArray>())
+        if (array.isNull())
+        {
+            arrayMemUsagePrev = 0;
+            array = JsonDoc.to<JsonArray>();
+        }
+
+        // size_t arrLen = 0;
+        size_t arrayMemUsageCurr;
+        size_t memUsageDiff;
+        if (nested.isNull())
+        {
+            nested = array.createNestedObject();
+            success = true;
+        }
+        else
+        {
+            arrayMemUsageCurr = array.memoryUsage();
+            memUsageDiff = arrayMemUsageCurr - arrayMemUsagePrev;
+            arrayMemUsagePrev = arrayMemUsageCurr;
+            bool test0 = arrayMemUsageCurr >= JSON_PROGMEM_SIZE;
+            bool test1 = (arrayMemUsageCurr + memUsageDiff) > JSON_PROGMEM_SIZE;
+            if (test0 || test1)
+            {
+                success = false;
+            }
+            else
+            {
+                nested = array.createNestedObject();
+                success = true;
+            }
+        }
+        return success;
+    }
+
 };
