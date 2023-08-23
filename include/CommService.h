@@ -93,10 +93,13 @@ namespace LFAST
 
         template <typename T>
         inline void addKeyValuePair(const char *key, T val);
-        inline bool startNewArrayObject();
+        inline bool startNewArrayObjectItem();
+        inline bool startNewArrayObjectItem(const char* key);
         inline bool startNewArray(const char *key);
         template <typename T>
         inline void addKeyValuePairToArray(const char *key, T val);
+        template <typename T>
+        inline void addKeyValuePairToArrayObjectItem(const char *key, T val);
         // inline void addKeyValuePair(const char *  key, T val);
         inline void addDestinationKey(const char *key){};
         // bool isMessageFull();
@@ -441,17 +444,20 @@ namespace LFAST
         return true;
     }
 
-    inline bool CommsMessage::startNewArrayObject()
+    // Returns true if it was able to do this without overflowing?
+    inline bool CommsMessage::startNewArrayObjectItem(const char* key)
     {
-        bool success = false;
-        // if (!JsonDoc.is<JsonArray>())
+        arrayKey = key;
         if (array.isNull())
         {
-            arrayMemUsagePrev = 0;
-            array = JsonDoc.to<JsonArray>();
+            startNewArray(key);
         }
+        return startNewArrayObjectItem();
+    }
 
-        // size_t arrLen = 0;
+    inline bool CommsMessage::startNewArrayObjectItem()
+    {
+        bool success = false;
         size_t arrayMemUsageCurr;
         size_t memUsageDiff;
         if (nested.isNull())
@@ -479,4 +485,12 @@ namespace LFAST
         return success;
     }
 
+    template <typename T>
+    inline void CommsMessage::addKeyValuePairToArrayObjectItem(const char *key, T val)
+    {
+        if (!nested.isNull())
+        {
+            nested[(key)] = val;
+        }
+    }
 };
