@@ -39,8 +39,9 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #define MAX_ARGS 4
 #define RX_BUFF_SIZE 1024
 
-#define MAX_KV_PAIRS 20
+#define MAX_KV_PAIRS 60
 #define JSON_PROGMEM_SIZE JSON_OBJECT_SIZE(MAX_KV_PAIRS)
+#define JSON_MAX_ARRAY_ITEM_SIZE JSON_OBJECT_SIZE(10)
 
 #define MAX_CTRL_MESSAGES 0x40U // can be increased if needed
 
@@ -94,7 +95,7 @@ namespace LFAST
         template <typename T>
         inline void addKeyValuePair(const char *key, T val);
         inline bool startNewArrayObjectItem();
-        inline bool startNewArrayObjectItem(const char* key);
+        inline bool startNewArrayObjectItem(const char *key);
         inline bool startNewArray(const char *key);
         template <typename T>
         inline void addKeyValuePairToArray(const char *key, T val);
@@ -445,7 +446,7 @@ namespace LFAST
     }
 
     // Returns true if it was able to do this without overflowing?
-    inline bool CommsMessage::startNewArrayObjectItem(const char* key)
+    inline bool CommsMessage::startNewArrayObjectItem(const char *key)
     {
         arrayKey = key;
         if (array.isNull())
@@ -471,7 +472,7 @@ namespace LFAST
             memUsageDiff = arrayMemUsageCurr - arrayMemUsagePrev;
             arrayMemUsagePrev = arrayMemUsageCurr;
             bool test0 = arrayMemUsageCurr >= JSON_PROGMEM_SIZE;
-            bool test1 = (arrayMemUsageCurr + memUsageDiff) > JSON_PROGMEM_SIZE;
+            bool test1 = (arrayMemUsageCurr + memUsageDiff + JSON_MAX_ARRAY_ITEM_SIZE) > JSON_PROGMEM_SIZE;
             if (test0 || test1)
             {
                 success = false;
@@ -493,4 +494,5 @@ namespace LFAST
             nested[(key)] = val;
         }
     }
+
 };
