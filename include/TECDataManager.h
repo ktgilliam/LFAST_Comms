@@ -14,12 +14,13 @@
 #define I2C_TIMEOUT 5
 
 #define TEC_COMMAND_SIZE 3
+
 struct TEC_Channel_Config
 {
   int dirPin;
   int pwmPin;
   // int thermistorPin; No more thermistor pins, it now goes to an ADC
-  bool thermistor;     // is there a thermistor or Seebeck temperature
+//   bool thermistor;     // is there a thermistor or Seebeck temperature
   int minimum_percent; // the Diodes, inc parts only go from about 15 percent to 100 percent
 };
 
@@ -71,8 +72,8 @@ public:
     int setLocalTECValue(uint8_t tec_chan, double pwmDutyCycle);
     int setRemoteTECValue(uint8_t board, uint8_t tec_chan, double pwmDutyCycle);
     void getRemoteTECSetPoints(uint8_t board);
-    void getLocalSeebecks();
-    void getRemoteSeebecks(uint8_t board);
+    // void getLocalSeebecks();
+    // void getRemoteSeebecks(uint8_t board);
 
 
     void pingCollectionStateMachine();

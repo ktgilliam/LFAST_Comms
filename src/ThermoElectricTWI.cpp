@@ -32,7 +32,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include "ThermoElectricTWI.h"
 #include <Wire.h>
 
-extern float m_SeebeckStorage[NUMBER_OF_CHANNELS];
+extern float m_SeebeckStorage[CHANNELS_PER_BOARD];
 extern ThermoElectricController TEC[NUM_TEC];
 
 int8_t cmdCode, pwmPctHighByte, pwmPctLowByte;

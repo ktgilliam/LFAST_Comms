@@ -1,7 +1,7 @@
 #include "TECMap.h"
 
 const TECMapEntry TECMap::defaultEntry = {0,0,0};
-
+// Box, Board, Channel
 const std::vector<TECMapEntry> TECMap::map = 
 {
 {2,2,2}, // TEC#1

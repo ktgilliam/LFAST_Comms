@@ -36,15 +36,11 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 // Overall version of the VCM module
 #define TEC_VERSION    "1.0 dev 1"
 
-// Overall version of the MQTT messages.  Increment this for any change to
-// the messages: added, deleted, renamed, different type, different function.
-#define COMMS_VERSION  2
 
 // Enable this to display diagnostic messages on the serial port
 //#define DEBUG
 
 //Only one of these should be defined, based on thermistor value.
-
 #define TEENSY_4_1
 
 #define production_TEST
@@ -52,22 +48,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #define NUM_MODULES   5
 #define MAX_BOARD_ID  (NUM_MODULES - 1)
 
-// Display diagnostic messages on serial port if debugging is enabled
-#ifdef DEBUG
-#define DebugPrint( msg )       Serial.println( msg )
-#define DebugPrintNoEOL( msg )  Serial.print( msg )
-#else
-#define DebugPrint( msg )
-#define DebugPrintNoEOL( msg )
-#endif
-
 #define TEENSY_VERSION ", Teensy 4.1"
-
-#ifdef DEBUG
-  #define DEBUG_VERSION ", DEBUG"
-#else
-  #define DEBUG_VERSION ""
-#endif
 
 // I don't think these pins are operable anymore
 #define I2C_ID_PIN_0 35
@@ -77,8 +58,8 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 //#define ID_PIN_4 33
 
 // This is where we program how many TECs are on a board
-#define NUMBER_OF_CHANNELS 16
-const uint8_t NUM_TEC = NUMBER_OF_CHANNELS; // 12 TEC
+#define CHANNELS_PER_BOARD 16
+const uint8_t NUM_TEC = CHANNELS_PER_BOARD;
 // This is where we program how many boards are in a box
 #define NUM_BOARDS NUM_MODULES
 
@@ -96,9 +77,9 @@ const uint16_t ADC_CMD_MODE_PROG = 0x8000; // ADC to enter into Auto-1 register 
 const uint16_t ADC_CMD_MODE_MANUAL = 0x1040;    // Select manual mode - add channel for D10 - D07 bits in routine
 
 #define ADC_SPI_BPS 1000000
-//static float m_Channel_pwr[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
-//static bool m_Channel_dir[NUM_BOARDS][NUMBER_OF_CHANNELS] = {false};
-//static float m_Channel_seebeck[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
+//static float m_Channel_pwr[NUM_BOARDS][CHANNELS_PER_BOARD] = {0.00};
+//static bool m_Channel_dir[NUM_BOARDS][CHANNELS_PER_BOARD] = {false};
+//static float m_Channel_seebeck[NUM_BOARDS][CHANNELS_PER_BOARD] = {0.00};
 
 // Define some of the I2C port's pins and configuration
 // We need to determine whether this is the controller or not

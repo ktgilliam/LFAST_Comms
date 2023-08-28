@@ -6,9 +6,9 @@
 #include "TECMap.h"
 
 // Let's define some variables to hold the data to be transmitted back
-volatile float m_Channel_pwr[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
-volatile float m_Channel_seebeck[NUM_BOARDS][NUMBER_OF_CHANNELS] = {0.00};
-volatile float m_SeebeckStorage[NUMBER_OF_CHANNELS] = {0.00};
+volatile float m_Channel_pwr[NUM_BOARDS][CHANNELS_PER_BOARD] = {0.00};
+volatile float m_Channel_seebeck[NUM_BOARDS][CHANNELS_PER_BOARD] = {0.00};
+volatile float m_SeebeckStorage[CHANNELS_PER_BOARD] = {0.00};
 
 ThermoElectricController TEC[NUM_TEC];
 bool calibrated = false;
@@ -132,42 +132,41 @@ void TECDataManager::processDataCommands()
   {
     TECDataCommand *cmdToProcess = requestList.front();
     // Process the command
-    double dutyCycle = 100.0* cmdToProcess->value / TEC_MAX_CURRENT;
-    cli->printfDebugMessage("Setting %d:%d to %f%", cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+    // double dutyCycle = 100.0 * cmdToProcess->value / TEC_MAX_CURRENT;
+    double dutyCycle = 100.0 * cmdToProcess->value;
+    // double dutyCycle = 100.0;
     if (cmdToProcess->boardNo == pTcm->getThisBoardNo())
     {
-      setLocalTECValue(cmdToProcess->channelNo, dutyCycle);
+      int result = setLocalTECValue(cmdToProcess->channelNo, dutyCycle);
+      cli->printfDebugMessage("Local: [b%d:c%d:pwm:%d:dir:%d] to %f%, Result=%d",
+        cmdToProcess->boardNo, cmdToProcess->channelNo, 
+        tec_ch_cfg[cmdToProcess->channelNo].pwmPin,tec_ch_cfg[cmdToProcess->channelNo].dirPin,
+          dutyCycle, result);
     }
     else
     {
-      setRemoteTECValue(cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+      int result = setRemoteTECValue(cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle);
+      cli->printfDebugMessage("Remote: [%d:%d] to %f%, Result=%d", cmdToProcess->boardNo, cmdToProcess->channelNo, dutyCycle, result);
     }
     delete cmdToProcess;
     requestList.pop_front();
   }
 }
+
 void TECDataManager::initialize()
 {
   // Initialize Timer
   Timer1.initialize(UPDATE_PRD_US);
   Timer1.stop();
   Timer1.attachInterrupt(TECControl_ISR);
-// setup the TECs
-// delay(1000);
-#if ADC_NOT_CONNECTED
-// Skipping this part
-#else
+  // setup the TECs
+  // delay(1000);
+
+  cli->printDebugMessage("Setting up pins");
   for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
   {
-    TEC[tec_chan].begin(
-        tec_ch_cfg[tec_chan].dirPin,
-        tec_ch_cfg[tec_chan].pwmPin,
-        tec_ch_cfg[tec_chan].thermistor,
-        tec_ch_cfg[tec_chan].minimum_percent);
-    TEST_SERIAL.printf("%d, ", tec_chan);
-    // delay(100);
+    TEC[tec_chan].begin(tec_ch_cfg[tec_chan].dirPin, tec_ch_cfg[tec_chan].pwmPin, 0.0);
   }
-#endif
   // **************************
   // Initialize the SPI port  *
   // **************************
@@ -202,6 +201,38 @@ void TECDataManager::initialize()
 //** Functions for interfacing remote boards/TECs
 //***********************************************
 //***********************************************
+
+//***********************************************
+//***********************************************
+//** Functions for interfacing the local TECs
+//***********************************************
+//***********************************************
+
+int TECDataManager::setLocalTECValue(uint8_t tec_chan, double pwmDutyCycle)
+{
+  uint8_t _error = 0; // Initialize to 0 for no error... yet
+  double pwmPct;
+
+  // Need two decimal places for the pwmPct
+  pwmPct = round((pwmDutyCycle)*100.0);
+  // pwmPct = 50*100.0;
+  // First make sure the data sent is within bounds
+  if ((pwmPct < -10000) || (pwmPct > 10000))
+  {
+    _error = POWER_OUT_OF_RANGE;
+    // Serial.println(err);
+    // Can I put a return here
+    return _error;
+  }
+
+  // Just set the channel to the pwmPct given
+  // TEC[tec_chan].setDutyCycle(50.0);
+  TEC[tec_chan].setDutyCycle(pwmPct / 100.0); // divide by 100 to get decimal places back
+                                              //    Serial.println("Setting the controller board");
+  m_Channel_pwr[0][tec_chan] = pwmDutyCycle;
+  return _error;
+} // End setTec handler
+
 int TECDataManager::setRemoteTECValue(uint8_t board, uint8_t tec_chan, double pwmDutyCycle)
 {
 
@@ -252,97 +283,66 @@ int TECDataManager::setRemoteTECValue(uint8_t board, uint8_t tec_chan, double pw
   return err;
 } // End setTec handler
 
-void TECDataManager::getRemoteSeebecks(uint8_t board)
-{
-  //  uint16_t seebeckvar;
-  char myseebeck[2];
-  // Here we send a command specifying data type and then request to send that data
-  // For each board, we'll go in TEC order and get each type of data
-  for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
-  {
-    int addr = (board - 1) + I2C_OFFSET;
-    int cmd = (tec_chan << 4) | I2C_CMD_REPORT_SEEBECK;
-    Wire1.beginTransmission(addr);
-    Wire1.write(cmd);
-    uint8_t _error = Wire1.endTransmission(); // send the channel and data type for the following request
-    if (_error == I2C_NO_ERROR)
-    {
-      uint16_t requestedBytes = sizeof(short);
-      Wire1.requestFrom(addr, requestedBytes); // This sets how many bytes we're asking to get back
-      uint16_t receivedBytes = 0;
-      while (requestedBytes > receivedBytes)
-      {
-        auto nb = Wire1.available();
-        if (nb)
-        {
-          myseebeck[nb - 1] = Wire1.read();
-          receivedBytes += nb;
-        }
-      }
-      // while (Wire1.available())
-      // {
-      //   myseebeck[Wire1.available() - 1] = Wire1.read();
-      // }
-      m_Channel_seebeck[board][tec_chan] = ((myseebeck[1] & 0x0f) << 8) | myseebeck[0];
-      // printStuff(board, myseebeck);
-    }
-    else
-    {
-      printErrorStatus(_error, tec_chan, board);
-      if (_error == I2C_OTHER_ERROR)
-      {
-        Wire1.end();
-        delay(1000);
-        Wire1.begin();
-      }
-    }
-    // Serial.print("Full power: "); Serial.println(fullpwr);
-    delay(20); // Is this necessary?
+// void TECDataManager::getLocalSeebecks()
+// {
+//   for (int tec_ch = 0; tec_ch < NUM_TEC; tec_ch++)
+//   {
+//     auto sbVal = TEC[tec_ch].getSeebeck(tec_ch);
+//     // #### Why should the first chunk of a float be the channel? - K
 
-  } // for loop close
-}
+//     m_SeebeckStorage[tec_ch] = sbVal;
+//   }
+// }
 
-//***********************************************
-//***********************************************
-//** Functions for interfacing the local TECs
-//***********************************************
-//***********************************************
+// void TECDataManager::getRemoteSeebecks(uint8_t board)
+// {
+//   //  uint16_t seebeckvar;
+//   char myseebeck[2];
+//   // Here we send a command specifying data type and then request to send that data
+//   // For each board, we'll go in TEC order and get each type of data
+//   for (int tec_chan = 0; tec_chan < NUM_TEC; tec_chan++)
+//   {
+//     int addr = (board - 1) + I2C_OFFSET;
+//     int cmd = (tec_chan << 4) | I2C_CMD_REPORT_SEEBECK;
+//     Wire1.beginTransmission(addr);
+//     Wire1.write(cmd);
+//     uint8_t _error = Wire1.endTransmission(); // send the channel and data type for the following request
+//     if (_error == I2C_NO_ERROR)
+//     {
+//       uint16_t requestedBytes = sizeof(short);
+//       Wire1.requestFrom(addr, requestedBytes); // This sets how many bytes we're asking to get back
+//       uint16_t receivedBytes = 0;
+//       while (requestedBytes > receivedBytes)
+//       {
+//         auto nb = Wire1.available();
+//         if (nb)
+//         {
+//           myseebeck[nb - 1] = Wire1.read();
+//           receivedBytes += nb;
+//         }
+//       }
+//       // while (Wire1.available())
+//       // {
+//       //   myseebeck[Wire1.available() - 1] = Wire1.read();
+//       // }
+//       m_Channel_seebeck[board][tec_chan] = ((myseebeck[1] & 0x0f) << 8) | myseebeck[0];
+//       // printStuff(board, myseebeck);
+//     }
+//     else
+//     {
+//       printErrorStatus(_error, tec_chan, board);
+//       if (_error == I2C_OTHER_ERROR)
+//       {
+//         Wire1.end();
+//         delay(1000);
+//         Wire1.begin();
+//       }
+//     }
+//     // Serial.print("Full power: "); Serial.println(fullpwr);
+//     delay(20); // Is this necessary?
 
-void TECDataManager::getLocalSeebecks()
-{
-  for (int tec_ch = 0; tec_ch < NUM_TEC; tec_ch++)
-  {
-    auto sbVal = TEC[tec_ch].getSeebeck(tec_ch);
-    // #### Why should the first chunk of a float be the channel? - K
-
-    m_SeebeckStorage[tec_ch] = sbVal;
-  }
-}
-
-int TECDataManager::setLocalTECValue(uint8_t tec_chan, double pwmDutyCycle)
-{
-  uint8_t _error = 0; // Initialize to 0 for no error... yet
-  double pwmPct;
-
-  // Need two decimal places for the pwmPct
-  pwmPct = round((pwmDutyCycle)*100.0);
-
-  // First make sure the data sent is within bounds
-  if ((pwmPct < -10000) || (pwmPct > 10000))
-  {
-    _error = POWER_OUT_OF_RANGE;
-    // Serial.println(err);
-    // Can I put a return here
-    return _error;
-  }
-
-  // Just set the channel to the pwmPct given
-  TEC[tec_chan].setDutyCycle(pwmPct / 100.0); // divide by 100 to get decimal places back
-                                              //    Serial.println("Setting the controller board");
-  m_Channel_pwr[0][tec_chan] = pwmDutyCycle;
-  return _error;
-} // End setTec handler
-
+//   } // for loop close
+// }
 void TECDataManager::setupPersistentFields()
 {
 }
@@ -372,17 +372,16 @@ void TECDataManager::printErrorStatus(uint8_t _error, uint8_t ch, uint8_t board)
 
 void TECDataManager::setAllToZero()
 {
+  cli->printDebugMessage("Setting all channels to zero duty");
   for (auto &tec : pTcm->cfg.tecConfigs)
   {
     if (tec->boardNo == pTcm->getThisBoardNo())
     {
       setLocalTECValue(tec->channelNo, 0.0);
-      cli->printfDebugMessage("Set local TEC%d to 0.0.", tec->channelNo);
     }
     else
     {
-      setRemoteTECValue(tec->boardNo, tec->channelNo, 0.0);
-      cli->printfDebugMessage("Set remote TEC%d:%d to 0.0.",tec->boardNo, tec->channelNo);
+      // setRemoteTECValue(tec->boardNo, tec->channelNo, 0.0);
     }
   }
 }

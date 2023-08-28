@@ -32,11 +32,11 @@ TerminalInterface *cli;
 LFAST::TcpCommsService *commsService; // This is the commsService
 void handshake(unsigned int val);
 void setTecNo(unsigned int tecNo);
-void boardNumber(unsigned int board);
-void channelNumber(unsigned int chan_num);
+// void boardNumber(unsigned int board);
+// void channelNumber(unsigned int chan_num);
 void commandTecDutyCycle(float dc);
 void allToZero(int placeholder);
-void sendTecData(int placeholder);
+void sendTecConfigData(int placeholder);
 // void getTECValuesByBoard(int board);
 // void getSeebeckByBoard(int board);
 
@@ -49,10 +49,12 @@ TECConfigManager *pTcm = &tcm;
 void setup()
 {
   // delay(3000);
-#if HARDWARE_SERIAL == 1
   cli = new TerminalInterface(DEVICE_CLI_LABEL, &(TEST_SERIAL), TEST_SERIAL_BAUD);
-#else
-  cli = new TerminalInterface(DEVICE_CLI_LABEL, &(TEST_SERIAL));
+#if WATCHDOG_ENABLED
+  // The watchdog timer resets the teensy if it gets stuck in a state which
+  // prevents the loop from running
+  configureWatchdog();
+  cli->printDebugMessage("Starting watchdog");
 #endif
   TECDataManager &tdm = TECDataManager::getDeviceController();
   pTdm = &tdm;
@@ -63,6 +65,7 @@ void setup()
   // bool configPresent = true;
   if (configPresent)
   {
+    cli->printDebugMessage("Config IS present.");
     pTdm->controllerMode();
     pTdm->connectConfigManager(pTcm);
     // cli->printDebugMessage("1");
@@ -71,35 +74,33 @@ void setup()
     // Only for the master TEC card
     // *************************
     // commsService = new LFAST::TcpCommsService(myIP);
+    cli->printDebugMessage("Setting up TCP/IP.");
     commsService = new LFAST::TcpCommsService(tcm.cfg.ip);
     commsService->connectTerminalInterface(cli);
     // commsService->initializeEnetIface(mPort);
     commsService->initializeEnetIface(tcm.cfg.port);
-    cli->printDebugMessage("Config IS present.");
     // TEST_SERIAL.printf("%d.%d.%d.%d:%d\r\n", tcm.cfg.ip[0], tcm.cfg.ip[1], tcm.cfg.ip[2], tcm.cfg.ip[3], tcm.cfg.port);
     if (commsService->Status())
     {
       //
+      cli->printDebugMessage("Setting up handlers");
       commsService->registerMessageHandler<unsigned int>("Handshake", handshake);
       commsService->registerMessageHandler<unsigned int>("TECNo", setTecNo);
       commsService->registerMessageHandler<float>("SetDuty", commandTecDutyCycle); // Will be changed to a current
 
       // commsService->registerMessageHandler<unsigned int>("Board", boardNumber);
       // commsService->registerMessageHandler<unsigned int>("Channel", channelNumber);
-      commsService->registerMessageHandler<int>("SendAll", sendTecData);
+      commsService->registerMessageHandler<int>("SendAll", sendTecConfigData);
       commsService->registerMessageHandler<int>("AllToZero", allToZero);
     }
+    pTdm->setAllToZero();
   }
   else
   {
     cli->printDebugMessage("Config is NOT present.");
     pTdm->peripheralMode();
   }
-#if WATCHDOG_ENABLED
-  // The watchdog timer resets the teensy if it gets stuck in a state which
-  // prevents the loop from running
-  configureWatchdog();
-#endif
+
   // The ARM controller on the Teensy will tell you if something in the code caused
   // The application to crash if you ask it to. The while loop is there to keep
   // the message up and give the user a chance to fix the problem before it power
@@ -111,6 +112,14 @@ void setup()
     ;
   }
   cli->printDebugMessage("Setup Done.", LFAST::INFO_MESSAGE);
+
+  // auto testCmd = new TECDataCommand(0, 0, -0.4);
+  // pTdm->addTecDataCommand(testCmd);
+  // pTdm->processDataCommands();
+  // while (1)
+  // {
+  //   ;
+  // }
 }
 
 void loop()
@@ -131,7 +140,6 @@ void loop()
   }
   else
   {
-    
   }
   // Serial.println("inside loop.");
 }
@@ -153,28 +161,31 @@ void handshake(unsigned int val)
 
 void setTecNo(unsigned int tecNo)
 {
-  // pTdm->setTecNo(tecNo);
-  cli->printfDebugMessage("New TEC Command: %d", tecNo);
   auto tecCfg = pTcm->getTecConfig(tecNo);
+  cli->printfDebugMessage("TEC Command: %d [%d:%d]", tecNo, tecCfg->boardNo, tecCfg->channelNo);
   if (tecCfg != nullptr)
   {
     newCommandPtr = new TECDataCommand(tecCfg->boardNo, tecCfg->channelNo);
   }
 }
 
-void commandTecDutyCycle(float currAmps)
+void commandTecDutyCycle(float duty)
 {
+  // cli->printfDebugMessage("Duty Cycle: %4.6f", duty);
   // If the box number didn't match, this should still be nullptr
   if (newCommandPtr != nullptr)
   {
-    newCommandPtr->type = CURRENT_COMMAND;
-    newCommandPtr->value = currAmps;
+    newCommandPtr->type = DUTY_REQUEST;
+    newCommandPtr->value = duty;
     pTdm->addTecDataCommand(newCommandPtr);
     newCommandPtr = nullptr;
   }
+  else
+  {
+    cli->printDebugMessage("Command with no TEC number.", LFAST::ERROR_MESSAGE);
+  }
   return;
 }
-
 
 void allToZero(int placeholder)
 {
@@ -182,27 +193,32 @@ void allToZero(int placeholder)
   pTdm->setAllToZero();
 }
 
-void sendTecData(int placeholder)
+void sendTecConfigData(int placeholder)
 {
-  cli->printDebugMessage("Inside sendTecData");
+  cli->printDebugMessage("Inside sendTecConfigData");
   LFAST::CommsMessage *newMsg = new LFAST::CommsMessage();
   bool result = false;
   unsigned int sentCfgs = 0;
   int sentMessages = 0;
+
+  // newMsg->addKeyValuePair<unsigned int>("num_tecs",  pTcm->cfg.tecConfigs.size());
+  // commsService->sendMessage(*newMsg, LFAST::CommsService::ACTIVE_CONNECTION);
+
   for (auto &tec : pTcm->cfg.tecConfigs)
   {
-    result = newMsg->startNewArrayObject("tecConfigList");
+    result = newMsg->startNewArrayObjectItem("tecConfigList");
     if (!result)
     {
+      // If it's full, send it and start a new one.
       commsService->sendMessage(*newMsg, LFAST::CommsService::ACTIVE_CONNECTION);
       sentMessages++;
       delete newMsg;
       newMsg = new LFAST::CommsMessage();
-      result = newMsg->startNewArrayObject("tecConfigList");
+      result = newMsg->startNewArrayObjectItem("tecConfigList");
     }
-    newMsg->addKeyValuePairToArrayItemObject<unsigned int>("ID", tec->tecNo);
-    newMsg->addKeyValuePairToArrayItemObject<unsigned int>("BRD", tec->boardNo);
-    newMsg->addKeyValuePairToArrayItemObject<unsigned int>("CHN", tec->channelNo);
+    newMsg->addKeyValuePairToArrayObjectItem<unsigned int>("ID", tec->tecNo);
+    newMsg->addKeyValuePairToArrayObjectItem<unsigned int>("BRD", tec->boardNo);
+    newMsg->addKeyValuePairToArrayObjectItem<unsigned int>("CHN", tec->channelNo);
     // FIXME::!!! There is a problem where if the buffer is full it will just leave one of these out. It needs to be fixed properly in CommService!!!!!
     sentCfgs++;
   }

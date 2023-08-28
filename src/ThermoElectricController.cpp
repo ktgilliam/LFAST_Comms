@@ -42,12 +42,7 @@ int ThermoElectricController::begin(const int dirP, const int pwmP, const int mi
   return 0;
 }
 
-void ThermoElectricController::setPwm(float duty)
-{
-  float scaled_power = fabs(duty) / 100 * (100 - minPercent) + minPercent;
-  float tmp = (float)((scaled_power * 255.0) / 100.0 + 0.5); // convert to 0-255 )
-  analogWrite(pwmPin, tmp);                                  //
-}
+
 
 int ThermoElectricController::setDutyCycle(const float power)
 {
@@ -66,8 +61,17 @@ int ThermoElectricController::setDutyCycle(const float power)
   // Convert to duty cycle
   // Set duty cycle
   setPwm(power);
+  // setPwm(50);
   pwmPct = power; // save the power setting
   return 0;
+}
+
+void ThermoElectricController::setPwm(float duty)
+{
+  float scaled_power = fabs(duty) / 100 * (100 - minPercent) + minPercent;
+  float tmp = (float)((scaled_power * 255.0) / 100.0 + 0.5); // convert to 0-255 )
+  // analogWrite(pwmPin, tmp);                                  //
+  analogWrite(pwmPin, tmp);      
 }
 
 // The Seebeck is now using the on-board ADC (ADS7953)
@@ -140,13 +144,12 @@ bool i2cHardwareID_init()
   hardware_id = (pin1 << 1) +
                 (pin0 << 0);
   delay(100);
-  DebugPrintNoEOL("Hardware ID = ");
-  DebugPrint(hardware_id);
+
 
   // Make sure ID is valid
   if (hardware_id < 0 || hardware_id > MAX_BOARD_ID)
   {
-    DebugPrint("invalid board ID detected, check jumpers");
+    TEST_SERIAL.println("invalid board ID detected, check jumpers");
     return false;
   }
   return true; // Success

@@ -21,7 +21,9 @@ bool TECConfigManager::parseConfiguration(const char *fileName)
 
             newTec->tecNo = obj["ID"];
             newTec->boardNo = obj["BOARD"];
-            newTec->channelNo = obj["CHANNEL"];
+            uint8_t chan_tmp = obj["CHANNEL"];
+            newTec->channelNo = chan_tmp-1; //-1 because c is zero indexed
+            // TEST_SERIAL.printf("!!! ID %d, CHAN %d\r\n", newTec->tecNo, newTec->channelNo);
             cfg.tecConfigs.push_back(newTec);
             if (newTec->boardNo < minBoardNo)
                 minBoardNo = newTec->boardNo;
