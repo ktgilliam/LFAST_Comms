@@ -59,7 +59,6 @@ void setup()
   TECDataManager &tdm = TECDataManager::getDeviceController();
   pTdm = &tdm;
   pTdm->connectTerminalInterface(cli, DEVICE_CLI_LABEL);
-  pTdm->initialize();
 
   bool configPresent = pTcm->parseConfiguration("config.json");
   // bool configPresent = true;
@@ -93,14 +92,14 @@ void setup()
       commsService->registerMessageHandler<int>("SendAll", sendTecConfigData);
       commsService->registerMessageHandler<int>("AllToZero", allToZero);
     }
-    pTdm->setAllToZero();
   }
   else
   {
-    cli->printDebugMessage("Config is NOT present.");
+    cli->printDebugMessage("Config is NOT present. Setting up peripheral mode.");
     pTdm->peripheralMode();
   }
-
+  pTdm->initialize();
+  pTdm->setAllToZero();
   // The ARM controller on the Teensy will tell you if something in the code caused
   // The application to crash if you ask it to. The while loop is there to keep
   // the message up and give the user a chance to fix the problem before it power

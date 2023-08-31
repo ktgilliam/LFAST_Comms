@@ -31,6 +31,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include "ThermoElectricController.h"
 #include "ThermoElectricTWI.h"
 #include <Wire.h>
+#include <teensy41_device.h>
 
 extern float m_SeebeckStorage[CHANNELS_PER_BOARD];
 extern ThermoElectricController TEC[NUM_TEC];
@@ -77,6 +78,7 @@ bool i2c_peripheral_init(void)
     //  Install some callbacks for the peripheral device
     Wire1.onRequest(requestEventHandler);
     Wire1.onReceive(receiveEventHandler);
+    TEST_SERIAL.printf("Finished setting up I2C\r\n");
     // There's no return values for begin, so can't do a proper error check
     return true;
 }
@@ -92,6 +94,7 @@ void receiveEventHandler(int bytesRecv)
 {
     byte recvData[bytesRecv];
     int tec_chan;
+    // TEST_SERIAL.printf("Inside RX event handler \r\n");
 
     for (int ii = 0; ii < bytesRecv; ii++)
     {
@@ -107,7 +110,12 @@ void receiveEventHandler(int bytesRecv)
                                           //        Serial.print("High Byte: "); Serial.println((pwmPctHighByte << 8));
                                           //        Serial.print("Low Byte: "); Serial.println(pwmPctLowByte & 0xff);
                                           //        Serial.print("Setting: "); Serial.println((((pwmPctHighByte << 8) | (pwmPctLowByte & 0xff))/100.0));
-        TEC[tec_chan].setDutyCycle((((pwmPctHighByte << 8) | (pwmPctLowByte & 0xff)) / 100.0));
+
+        float cmd = (((pwmPctHighByte << 8) | (pwmPctLowByte & 0xff)) / 100.0);
+        if (abs(cmd) > 0.0)
+            TEST_SERIAL.printf("RX event: Ch %d: %4.2f\r\n", tec_chan, cmd);
+
+        TEC[tec_chan].setDutyCycle(cmd);
     }
     return;
 }
@@ -123,6 +131,7 @@ void receiveEventHandler(int bytesRecv)
 void requestEventHandler(void)
 {
     int dataReq, chan;
+    TEST_SERIAL.printf("Inside TX event handler \r\n");
 
     // This is where we send back data according to the cmdCode
     // cmdCode Most Sig Nibble channel
@@ -144,7 +153,7 @@ void requestEventHandler(void)
         reportSeebeckHandler(chan);
         break;
     default:
-        Serial.println("In request event for i2c, but no match");
+        TEST_SERIAL.println("In request event for i2c, but no match");
         break;
     }
 
@@ -158,7 +167,7 @@ void reportSetPointHandler(uint8_t chan)
     bool dir;
     /* code */
     data = round(TEC[chan].getDutyCycle() * 100.0); // This gets the power for the requested channel, now we need to send it
-                                                //        Serial.print("Data: "); Serial.println(data);
+                                                    //        Serial.print("Data: "); Serial.println(data);
     dir = TEC[chan].getDirection();
     data *= dir * -1;
     if (data < 0)

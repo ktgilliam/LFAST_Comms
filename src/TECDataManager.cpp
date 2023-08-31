@@ -381,7 +381,7 @@ void TECDataManager::setAllToZero()
     }
     else
     {
-      // setRemoteTECValue(tec->boardNo, tec->channelNo, 0.0);
+      setRemoteTECValue(tec->boardNo, tec->channelNo, 0.0);
     }
   }
 }
