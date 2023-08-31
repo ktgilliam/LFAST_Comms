@@ -40,7 +40,6 @@ void watchdogWarning()
 /// @param timeout in seconds
 void configureWatchdog(uint8_t timeout)
 {
-    TEST_SERIAL.print("Starting watchdog");
     WDT_timings_t config;
     config.trigger = 5;  /* in seconds, 0->128 */
     config.timeout = timeout; /* in seconds, 0->128 */

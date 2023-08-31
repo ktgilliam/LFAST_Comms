@@ -35,31 +35,32 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #define NUM_SERIAL_DEVICES 7
 #endif
 
-#if !defined(TERMINAL_ENABLED) && !defined(TERMINAL_DISABLED)
+// #if !defined(TERMINAL_ENABLED) && !defined(TERMINAL_DISABLED)
+// #if defined(TEST_SERIAL_NO)
+// // #define TERMINAL_ENABLED
+// // #else
+// // #define TERMINAL_DISABLED
+// #endif
+// #endif
+
+// #if defined(TERMINAL_ENABLED) && !defined(TEST_SERIAL_NO)
+// #warning "Terminal enabled but test serial not defined."
+// #warning "Define TEST_SERIAL_NO in build flags."
+// #warning "Defaulting to Hardware serial #2 at 230400 bps."
+// #define TEST_SERIAL_NO 2
+// #endif
+
+// #if defined(TERMINAL_ENABLED) && !defined(TEST_SERIAL_BAUD)
+// #warning "Terminal enabled but test serial not defined."
+// #warning "Define TEST_SERIAL_BAUD in build flags."
+// #warning "Defaulting to Hardware serial #2 at 230400 bps."
+// #define TEST_SERIAL_BAUD (uint32_t)230400
+// #endif
+
+
+
 #if defined(TEST_SERIAL_NO)
-#define TERMINAL_ENABLED
-#else
-#define TERMINAL_DISABLED
-#endif
-#endif
-
-#if defined(TERMINAL_ENABLED) && !defined(TEST_SERIAL_NO)
-#warning "Terminal enabled but test serial not defined."
-#warning "Define TEST_SERIAL_NO in build flags."
-#warning "Defaulting to Hardware serial #2 at 230400 bps."
-#define TEST_SERIAL_NO 2
-#endif
-
-#if defined(TERMINAL_ENABLED) && !defined(TEST_SERIAL_BAUD)
-#warning "Terminal enabled but test serial not defined."
-#warning "Define TEST_SERIAL_BAUD in build flags."
-#warning "Defaulting to Hardware serial #2 at 230400 bps."
-#define TEST_SERIAL_BAUD (uint32_t)230400
-#endif
-
-
-
-#if defined(TERMINAL_ENABLED)
+    #define TEST_SERIAL_TYPE HardwareSerial
     #if TEST_SERIAL_NO==1
         #define TEST_SERIAL_RX_PIN 0
         #define TEST_SERIAL_TX_PIN 1
@@ -92,7 +93,10 @@ this program. If not, see <https://www.gnu.org/licenses/>.
     #endif
 
     #define TEST_SERIAL SERIAL_CH(TEST_SERIAL_NO)
-
+#else
+    #define TEST_SERIAL Serial
+    #define TEST_SERIAL_TYPE usb_serial_class
+    #define TEST_SERIAL_BAUD 9600
 #endif
 
 #define MODBUS_SERIAL_NO 1
