@@ -50,6 +50,7 @@
 		"macro.h",
 		"PID_Controller.h",
 		"teensy41_device.h",
-		"TerminalInterface.h"
+		"TerminalInterface.h",
+		"SDConfigFileReader.h"
 	]
 }
