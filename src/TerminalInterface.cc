@@ -82,8 +82,6 @@ void TerminalInterface::printHeader()
     std::string HEADER_LABEL_ROW_SIDE = std::string((TERMINAL_WIDTH - HEADER_LABEL_STRING.size()) / 2 - 1, '#');
     std::string HEADER_LABEL_ROW = HEADER_LABEL_ROW_SIDE + " " + HEADER_LABEL_STRING + " " + HEADER_LABEL_ROW_SIDE;
 
-    TEST_SERIAL_TYPE * serial;
-
     cursorToRow(LFAST::TOP_HEADER);
     serial->printf("%s", HEADER_BORDER_STRING.c_str());
     cursorToRow(LFAST::MIDDLE_HEADER);
