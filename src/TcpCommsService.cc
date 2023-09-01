@@ -52,18 +52,19 @@ bool LFAST::TcpCommsService::hardwareConfigurationDone = false;
 
 byte LFAST::TcpCommsService::mac[6] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
+byte defaultIpAddr[4] = {0,0,0,0};
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-LFAST::TcpCommsService::TcpCommsService(byte *ipBytes)
+LFAST::TcpCommsService::TcpCommsService(byte*ipBytes=(byte*)&defaultIpAddr)
 {
     ip = IPAddress(ipBytes[0], ipBytes[1], ipBytes[2], ipBytes[3]);
 }
 
-LFAST::TcpCommsService::TcpCommsService()
-{
-    ip = IPAddress(0, 0, 0, 0);
-}
+// LFAST::TcpCommsService::TcpCommsService()
+// {
+//     ip = IPAddress(0, 0, 0, 0);
+// }
 
 bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
 {

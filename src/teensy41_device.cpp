@@ -40,14 +40,13 @@ void watchdogWarning()
 /// @param timeout in seconds
 void configureWatchdog(uint8_t timeout)
 {
-    TEST_SERIAL.print("Starting watchdog");
+#if WATCHDOG_ENABLED
     WDT_timings_t config;
     config.trigger = 5;  /* in seconds, 0->128 */
     config.timeout = timeout; /* in seconds, 0->128 */
     config.callback = watchdogWarning;
     config.pin = LED_PIN;
     pinMode(LED_PIN, OUTPUT);
-#if WATCHDOG_ENABLED
     wdt_ready = true;
     wdt.begin(config);
 #endif
@@ -55,8 +54,10 @@ void configureWatchdog(uint8_t timeout)
 
 void feedWatchDog()
 {
+#if WATCHDOG_ENABLED
     if (wdt_ready)
         wdt.feed();
+#endif
 }
 
 /// @brief Prints out explanations in case a fault was detected

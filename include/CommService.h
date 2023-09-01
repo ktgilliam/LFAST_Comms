@@ -39,7 +39,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #define MAX_ARGS 4
 #define RX_BUFF_SIZE 1024
 
-#define MAX_KV_PAIRS 60
+#define MAX_KV_PAIRS 20
 #define JSON_PROGMEM_SIZE JSON_OBJECT_SIZE(MAX_KV_PAIRS)
 #define JSON_MAX_ARRAY_ITEM_SIZE JSON_OBJECT_SIZE(10)
 
@@ -84,11 +84,7 @@ namespace LFAST
         {
             return this->JsonDoc;
         }
-#if defined(TERMINAL_ENABLED)
         DynamicJsonDocument &deserialize(TerminalInterface *debugCli = nullptr);
-#else
-        DynamicJsonDocument &deserialize();
-#endif
         template <typename T>
         inline T getValue(const char *key);
 
@@ -118,9 +114,7 @@ namespace LFAST
             return processed;
         }
 
-#if defined(TERMINAL_ENABLED)
         void printMessageInfo(TerminalInterface *debugCli = nullptr);
-#endif
 
     protected:
         DynamicJsonDocument JsonDoc;
@@ -177,10 +171,7 @@ namespace LFAST
         static std::vector<ClientConnection> connections;
         ClientConnection *activeConnection;
         bool commsServiceStatus;
-
-#if defined(TERMINAL_ENABLED)
         virtual void setupPersistentFields() override;
-#endif
     private:
         enum HandlerType
         {

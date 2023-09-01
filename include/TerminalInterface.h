@@ -31,7 +31,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <teensy41_device.h>
 
-#if defined(TERMINAL_ENABLED)
+// #if defined(TERMINAL_ENABLED)
 #define CLI_BUFF_LENGTH 90
 
 #define RED "\033[31m"
@@ -73,7 +73,8 @@ namespace LFAST
 class TerminalInterface
 {
 protected:
-    HardwareSerial *serial;
+    TEST_SERIAL_TYPE *serial;
+
     uint32_t currentInputCol;
     char rxBuff[CLI_BUFF_LENGTH];
     char *rxPtr;
@@ -88,6 +89,7 @@ protected:
         bool printAsSexa;
     };
 
+    void initialize();
 private:
     uint16_t debugMessageCount;
     uint16_t firstDebugRow = LFAST::NUM_HEADER_ROWS + 1;
@@ -102,7 +104,7 @@ private:
     uint16_t highestFieldRowNum;
 
 public:
-    TerminalInterface(const std::string &, HardwareSerial *, uint32_t);
+    TerminalInterface(const std::string &, TEST_SERIAL_TYPE *, uint32_t);
 
     void registerDevice(const std::string &);
     void serviceCLI();
@@ -176,4 +178,4 @@ inline std::string debugCodeIdStr(std::string file, int line)
 
 #define DEBUG_CODE_ID_STR debugCodeIdStr(__FILE__, __LINE__)
 
-#endif
+// #endif

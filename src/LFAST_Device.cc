@@ -21,7 +21,6 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <cstdio>
 // #include "teensy41_device.h"
 
-#if defined(TERMINAL_ENABLED)
 TerminalInterface *LFAST_Device::cli = nullptr;
 
 /// @brief Assigns a pointer to the terminal object
@@ -56,4 +55,3 @@ void LFAST_Device::connectTerminalInterface(TerminalInterface *_cli, const char 
     deviceNamed = true;
     connectTerminalInterface(_cli);
 }
-#endif

@@ -34,18 +34,28 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <utility>
 
 #include "teensy41_device.h"
-#if defined(TERMINAL_ENABLED)
-TerminalInterface::TerminalInterface(const std::string &_label, HardwareSerial *_serial, uint32_t _baud = 230400)
+
+/// @brief 
+/// @param _label 
+/// @param _serial 
+/// @param _baud 
+TerminalInterface::TerminalInterface(const std::string &_label, TEST_SERIAL_TYPE *_serial, uint32_t _baud = 230400)
     : serial(_serial), ifLabel(_label)
 {
     serial->begin(_baud);
+    initialize();
+};
+
+/// @brief 
+void TerminalInterface::initialize()
+{
     clearConsole();
     debugRowOffset = 0;
     debugMessageCount = 0;
     promptRow = LFAST::NUM_HEADER_ROWS + 1;
     printHeader();
     highestFieldRowNum = 0;
-};
+}
 
 /// @brief Add a new LFAST_Device's ID string to the device table
 /// @param devStr Device's identifying string
@@ -60,6 +70,8 @@ void TerminalInterface::registerDevice(const std::string &devStr)
 
     senderRowOffsetMap.insert(devMap);
 }
+
+/// @brief 
 void TerminalInterface::printHeader()
 {
     cursorToRow(LFAST::TOP_HEADER);
@@ -374,4 +386,3 @@ int fs_sexa(char *out, double a, int w, int fracbase)
 
     return (out - out0);
 }
-#endif
