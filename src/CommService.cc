@@ -48,7 +48,7 @@ void LFAST::CommsService::defaultMessageHandler(const char *info)
 {
     if (cli != nullptr)
     {
-        cli->printfDebugMessage(F("Unregistered Message: [%s].\r\n"), info);
+        cli->printfDebugMessage(FLASH_STR("Unregistered Message: [%s].\r\n"), info);
     }
 }
 
@@ -58,7 +58,7 @@ void LFAST::CommsService::errorMessageHandler(CommsMessage &msg)
     {
         char msgBuff[JSON_PROGMEM_SIZE]{0};
         msg.getMessageStr(msgBuff);
-        cli->printfDebugMessage(F("Invalid Message: %s"), msgBuff);
+        cli->printfDebugMessage(FLASH_STR("Invalid Message: %s"), msgBuff);
     }
 }
 
@@ -138,8 +138,8 @@ void LFAST::CommsMessage::printMessageInfo(TerminalInterface *debugCli)
 {
     if (debugCli != nullptr)
     {
-        debugCli->printfDebugMessage(F("MESSAGE ID: %u\033[0K\r\n"), (unsigned int)this->getBuffPtr());
-        debugCli->printDebugMessage(F("MESSAGE Input Buffer: \033[0K"));
+        debugCli->printfDebugMessage(FLASH_STR("MESSAGE ID: %u\033[0K\r\n"), (unsigned int)this->getBuffPtr());
+        debugCli->printDebugMessage(FLASH_STR("MESSAGE Input Buffer: \033[0K"));
 
         // bool nullTermFound = false;
         // unsigned int ii = 0;
@@ -186,7 +186,7 @@ void LFAST::CommsService::processMessage(CommsMessage *msg, const char *destFilt
     {
         if (cli != nullptr)
         {
-            cli->printDebugMessage(F("Something went wrong processing messages."));
+            cli->printDebugMessage(FLASH_STR("Something went wrong processing messages."));
         }
         return;
     }
@@ -283,7 +283,7 @@ void LFAST::CommsService::sendMessage(CommsMessage &msg, uint8_t sendOpt)
 #if defined(TERMINAL_ENABLED)
             if (cli != nullptr)
             {
-                cli->printDebugMessage(F("Error: Active connection is null"), LFAST::ERROR_MESSAGE);
+                cli->printDebugMessage(FLASH_STR("Error: Active connection is null"), LFAST::ERROR_MESSAGE);
             }
 #endif
             return;
@@ -332,7 +332,7 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize(TerminalInterface *debugCl
         {
             if (debugCli != nullptr)
             {
-                debugCli->printfDebugMessage(F("deserializeJson() failed: %s"), error.c_str());
+                debugCli->printfDebugMessage(FLASH_STR("deserializeJson() failed: %s"), error.c_str());
             }
         }
 #else
@@ -342,7 +342,7 @@ DynamicJsonDocument &LFAST::CommsMessage::deserialize(TerminalInterface *debugCl
     else
     {
 #if defined(TERMINAL_ENABLED)
-        debugCli->printfDebugMessage(F("jsonInputBuffer nullptr error"));
+        debugCli->printfDebugMessage(FLASH_STR("jsonInputBuffer nullptr error"));
 #endif
         while (1)
         {
