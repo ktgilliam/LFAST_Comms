@@ -96,7 +96,10 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #else
     #define TEST_SERIAL Serial
     #define TEST_SERIAL_TYPE usb_serial_class
-    #define TEST_SERIAL_BAUD 9600
+#endif
+
+#ifndef TEST_SERIAL_BAUD
+#define TEST_SERIAL_BAUD 9600
 #endif
 
 #define MODBUS_SERIAL_NO 1

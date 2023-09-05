@@ -41,12 +41,8 @@
 			"version": "^6.19.4"
 		},
 		{
-			"owner": "tonton81",
 			"name": "WDT_T4",
-			"repository": {
-				"type": "git",
-				"url": "https://github.com/tonton81/WDT_T4.git"
-			}
+			"version": "https://github.com/tonton81/WDT_T4.git"
 		}
 	],
 	"frameworks": "arduino",
