@@ -34,14 +34,14 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 // #if defined(TERMINAL_ENABLED)
 #define CLI_BUFF_LENGTH 90
 
-#define RED F("\033[31m")
-#define GREEN F("\033[32m")
-#define YELLOW F("\033[33m")
-#define BLUE F("\033[34m")
-#define MAGENTA F("\033[35m")
-#define CYAN F("\033[36m")
-#define WHITE F("\033[37m")
-#define RESET F("\033[0m")
+#define RED FLASH_STR("\033[31m")
+#define GREEN FLASH_STR("\033[32m")
+#define YELLOW FLASH_STR("\033[33m")
+#define BLUE FLASH_STR("\033[34m")
+#define MAGENTA FLASH_STR("\033[35m")
+#define CYAN FLASH_STR("\033[36m")
+#define WHITE FLASH_STR("\033[37m")
+#define RESET FLASH_STR("\033[0m")
 
 #define TERMINAL_WIDTH 95
 #define PRINT_SERVICE_COUNTER 0
@@ -123,25 +123,25 @@ public:
     void printPersistentFieldLabels();
 
     // clang-format off
-    inline void clearConsole() {serial->printf(F("\033[2J")); }
-    inline void clearToEndOfRow() { serial->printf(F("\033[0K")); }
-    inline void cursorToRowCol(unsigned int row, unsigned int col) { serial->printf(F("\033[%u;%uH"), row+1, col); }
-    inline void cursorToRow(int row) { serial->printf(F("\033[%u;%uH"), (row + 1), 0); }
-    inline void cursorToCol(int col) { serial->printf(F("\033[%uG"), col); }
+    inline void clearConsole() {serial->printf(FLASH_STR("\033[2J")); }
+    inline void clearToEndOfRow() { serial->printf(FLASH_STR("\033[0K")); }
+    inline void cursorToRowCol(unsigned int row, unsigned int col) { serial->printf(FLASH_STR("\033[%u;%uH"), row+1, col); }
+    inline void cursorToRow(int row) { serial->printf(FLASH_STR("\033[%u;%uH"), (row + 1), 0); }
+    inline void cursorToCol(int col) { serial->printf(FLASH_STR("\033[%uG"), col); }
 
-    inline void red() { serial->printf(F("\033[31m")); }
-    inline void green() { serial->printf(F("\033[32m")); }
-    inline void yellow() {serial->printf(F("\033[33m")); }
-    inline void blue() { serial->printf(F("\033[34m")); }
-    inline void magenta() { serial->printf(F("\033[35m")); }
-    inline void cyan() { serial->printf(F("\033[36m")); }
-    inline void white() { serial->printf(F("\033[37m")); }
-    inline void reset() { serial->printf(F("\033[0m")); }
+    inline void red() { serial->printf(FLASH_STR("\033[31m")); }
+    inline void green() { serial->printf(FLASH_STR("\033[32m")); }
+    inline void yellow() {serial->printf(FLASH_STR("\033[33m")); }
+    inline void blue() { serial->printf(FLASH_STR("\033[34m")); }
+    inline void magenta() { serial->printf(FLASH_STR("\033[35m")); }
+    inline void cyan() { serial->printf(FLASH_STR("\033[36m")); }
+    inline void white() { serial->printf(FLASH_STR("\033[37m")); }
+    inline void reset() { serial->printf(FLASH_STR("\033[0m")); }
 
-    inline void blinking() { serial->printf(F("\033[5m")); }
-    inline void notBlinking() { serial->printf(F("\033[25m")); }
-    inline void hideCursor() { serial->printf(F("\033[?25l")); }
-    inline void showCursor() { serial->printf(F("\033[?25h")); }
+    inline void blinking() { serial->printf(FLASH_STR("\033[5m")); }
+    inline void notBlinking() { serial->printf(FLASH_STR("\033[25m")); }
+    inline void hideCursor() { serial->printf(FLASH_STR("\033[?25l")); }
+    inline void showCursor() { serial->printf(FLASH_STR("\033[?25h")); }
     // clang-format on
     // void printDebugInfo();
 };

@@ -146,7 +146,7 @@ void TerminalInterface::handleCliCommand()
 {
     cursorToRow(promptRow + 1);
     clearToEndOfRow();
-    serial->printf(F("%s: Command Not Found.\r\n"), rxBuff);
+    serial->printf(FLASH_STR("%s: Command Not Found.\r\n"), rxBuff);
     resetPrompt();
 }
 
@@ -194,7 +194,7 @@ void TerminalInterface::printPersistentFieldLabels()
     {   
         cursorToRow(field->printRow);
         clearToEndOfRow();
-        serial->printf(F("\033[0K\033[37m%s:\033[22G"), field->label.c_str());
+        serial->printf(FLASH_STR("\033[0K\033[37m%s:\033[22G"), field->label.c_str());
     }
     resetPrompt();
 }
@@ -380,7 +380,7 @@ int fs_sexa(char *out, double a, int w, int fracbase)
         out += snprintf(out, LFAST::MAX_CLOCKBUFF_LEN, ":%02d:%02d.%02d", m, s / 100, s % 100);
         break;
     default:
-        printf(F("fs_sexa: unknown fracbase: %d\n"), fracbase);
+        printf(FLASH_STR("fs_sexa: unknown fracbase: %d\n"), fracbase);
         return -1;
     }
 

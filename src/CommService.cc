@@ -398,13 +398,13 @@ void LFAST::CommsService::setupPersistentFields()
 {
     if (cli == nullptr)
         return;
-    cli->addPersistentField(this->DeviceName, F("[STATUS]"), COMMS_SERVICE_STATUS_ROW);
+    cli->addPersistentField(this->DeviceName, FLASH_STR("[STATUS]"), COMMS_SERVICE_STATUS_ROW);
 
-    cli->addPersistentField(this->DeviceName, F("[RAW RX]"), RAW_MESSAGE_RECEIVED_ROW);
+    cli->addPersistentField(this->DeviceName, FLASH_STR("[RAW RX]"), RAW_MESSAGE_RECEIVED_ROW);
 
-    cli->addPersistentField(this->DeviceName, F("[PROCESSED RX]"), PROCESSED_MESSAGE_ROW);
+    cli->addPersistentField(this->DeviceName, FLASH_STR("[PROCESSED RX]"), PROCESSED_MESSAGE_ROW);
 
-    cli->addPersistentField(this->DeviceName, F("[TX]"), MESSAGE_SENT_ROW);
+    cli->addPersistentField(this->DeviceName, FLASH_STR("[TX]"), MESSAGE_SENT_ROW);
 }
 // void LFAST::CommsService::updateStatusFields()
 // {

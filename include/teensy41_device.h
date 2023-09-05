@@ -57,7 +57,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 // #define TEST_SERIAL_BAUD (uint32_t)230400
 // #endif
 
-
+#define FLASH_STR(s) (const char*)F(s)
 
 #if defined(TEST_SERIAL_NO)
     #define TEST_SERIAL_TYPE HardwareSerial

@@ -83,7 +83,7 @@ bool LFAST::TcpCommsService::initializeEnetIface(uint16_t _port)
         {
             #if defined(TERMINAL_ENABLED)
             if (cli != nullptr)
-                cli->printfDebugMessage(F("Ethernet PHY was not found.  Sorry, can't run without hardware. :("));
+                cli->printfDebugMessage(FLASH_STR("Ethernet PHY was not found.  Sorry, can't run without hardware. :("));
                 #endif
             initResult = false;
         }
@@ -104,7 +104,7 @@ bool LFAST::TcpCommsService::checkForNewClients()
         newClientFlag = true;
         #if defined(TERMINAL_ENABLED)
         if (cli != nullptr)
-            cli->printfDebugMessage(F("Connection # %d Made.\r\n"), connections.size() + 1);
+            cli->printfDebugMessage(FLASH_STR("Connection # %d Made.\r\n"), connections.size() + 1);
             #endif
         // Once we "accept", the client is no longer tracked by EthernetServer
         // so we must store it into our list of clients
