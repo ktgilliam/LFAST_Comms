@@ -28,7 +28,7 @@ bool SdConfigFileReader::loadConfiguration(const char* fileName)
             ReadBufferingStream bufferedFile(configFile, 64);
             DeserializationError error = deserializeJson(doc, bufferedFile);
             if (error)
-                TEST_SERIAL.println(F("Failed to read file, using default configuration"));
+                TEST_SERIAL.println(FLASH_STR("Failed to read file, using default configuration"));
         }
         // close the file:
         configFile.close();
@@ -49,7 +49,7 @@ void SdConfigFileReader::printFile(const char *filename)
     File file = SD.open(filename);
     if (!file)
     {
-        TEST_SERIAL.println(F("Failed to read file"));
+        TEST_SERIAL.println(FLASH_STR("Failed to read file"));
         return;
     }
 
