@@ -13,6 +13,10 @@
 	},
 
 	"dependencies": [{
+			"name": "FNET",
+			"version": "https://github.com/vjmuzik/FNET.git"
+		},
+		{
 			"name": "NativeEthernet",
 			"repository": {
 				"type": "git",

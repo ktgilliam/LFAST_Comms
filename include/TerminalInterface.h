@@ -45,6 +45,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 
 #define TERMINAL_WIDTH 95
 #define PRINT_SERVICE_COUNTER 0
+#define MAX_MSG_CHARS 100
 
 namespace LFAST
 {
@@ -151,9 +152,10 @@ public:
 template <typename... Args>
 void TerminalInterface::printfDebugMessage(const char *fmt, Args... args)
 {
-    char msgBuff[100]{0};
-    sprintf(msgBuff, fmt, args...);
-    printDebugMessage(msgBuff);
+    char msgBuff[MAX_MSG_CHARS]{0};
+    int ret = snprintf(msgBuff, sizeof(msgBuff), fmt, args...);
+    if(ret >= 0)
+        printDebugMessage(msgBuff);
 }
 
 int fs_sexa(char *out, double a, int w, int fracbase);
