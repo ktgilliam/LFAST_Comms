@@ -24,7 +24,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #ifdef DEVICE_LABEL
 #define DEVICE_CLI_LABEL STR(DEVICE_LABEL)
 #else
-#define DEVICE_CLI_LABEL "LFAST_DEVICE"
+#define DEVICE_CLI_LABEL F("LFAST_DEVICE")
 #endif
 
 #define SERIAL_CH(N) CONCAT(Serial, N)
@@ -157,7 +157,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #define TOGGLE_LED_PIN() digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 
 
-#define PRINT_GOT_HERE() TEST_SERIAL.printf("@ %s: %d\r\n", __FILE__, __LINE__);delay(100);
+#define PRINT_GOT_HERE() TEST_SERIAL.printf(F("@ %s: %d\r\n"), __FILE__, __LINE__);delay(100);
 
 void configureWatchdog(uint8_t timeout=10);
 void watchdogWarning();

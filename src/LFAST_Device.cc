@@ -38,7 +38,7 @@ void LFAST_Device::connectTerminalInterface(TerminalInterface *_cli)
     deviceCount++;
     if (!deviceNamed)
     {
-        std::sprintf(DeviceName, "Device_%d", deviceCount);
+        std::sprintf(DeviceName, F("Device_%d"), deviceCount);
         deviceNamed = true;
     }
     cli = _cli;

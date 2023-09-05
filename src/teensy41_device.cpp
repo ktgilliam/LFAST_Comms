@@ -27,7 +27,7 @@ bool wdt_ready = false;
 /// @brief Prints a watchdog timer warning
 void watchdogWarning()
 {
-    TEST_SERIAL.print("\033[31mDanger - feed the dog!\033[37m");
+    TEST_SERIAL.print(F("\033[31mDanger - feed the dog!\033[37m"));
 }
 
 /// @brief Configure the teensy's watchdog timer
@@ -74,7 +74,7 @@ bool checkForCrashReport()
     if (CrashReport)
     {
         CrashReport.printTo(TEST_SERIAL);
-        TEST_SERIAL.print("\nPower cycle to clear this error.");
+        TEST_SERIAL.print(F("\nPower cycle to clear this error."));
         thereWasACrash = true;
     }
     return thereWasACrash;
