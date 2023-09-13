@@ -21,10 +21,9 @@
 			"repository": {
 				"type": "git",
 				"url": "https://github.com/vjmuzik/NativeEthernet.git"
-			}
-			"build":
-			{
-				"flags": ["-DTEENSY_OPT_SMALLEST_CODE]
+			},
+			"build": {
+				"flags": ["-DTEENSY_OPT_SMALLEST_CODE"]
 			}
 		},
 		{
